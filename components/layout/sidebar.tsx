@@ -8,12 +8,14 @@ import { ThemeToggle } from "@/components/theme-toggle";
 export function Sidebar({
   channels,
   onNewChannel,
+  onGoHome,
   selectedId,
   onSelectChannel,
   onAddVideo,
 }: {
   channels: ChannelRow[];
   onNewChannel: () => void;
+  onGoHome: () => void;
   selectedId: string | null;
   onSelectChannel: (id: string) => void;
   onAddVideo: (channelId: string) => void;
@@ -22,8 +24,14 @@ export function Sidebar({
     <aside className="hidden w-[260px] shrink-0 border-r border-border bg-paper lg:flex lg:flex-col">
       <div className="border-b border-border px-4 py-4">
         <div className="mb-3">
-          <div className="font-serif text-h4 text-foreground">Praxis</div>
-          <div className="text-body text-muted">Personal project memory</div>
+          <button
+            type="button"
+            onClick={onGoHome}
+            className="block w-full rounded-md text-left outline-none ring-offset-2 ring-offset-paper transition-opacity hover:opacity-85 focus-visible:ring-2 focus-visible:ring-accent dark:ring-offset-paper"
+          >
+            <div className="font-serif text-h4 text-foreground">Praxis</div>
+            <div className="text-body text-muted">Personal project memory</div>
+          </button>
         </div>
 
         <button

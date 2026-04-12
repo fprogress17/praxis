@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { ChannelsPanelRail } from "@/components/layout/channels-panel-rail";
 import { CenterPanel } from "@/components/layout/center-panel";
 import { MobileChannelsCollapsedBar } from "@/components/layout/mobile-channels-collapsed-bar";
@@ -38,8 +38,10 @@ export function PraxisShell({
   /** Mobile: full top nav vs slim bar when composing/editing video. */
   const [mobileChannelsOpen, setMobileChannelsOpen] = useState(true);
 
+  const mainRowRef = useRef<HTMLDivElement>(null);
+  const resizeHandleRef = useRef<HTMLDivElement>(null);
   const { widthPx: rightPanelWidthPx, dragging: rightPanelDragging, onResizePointerDown } =
-    useRightPanelWidth();
+    useRightPanelWidth(mainRowRef, resizeHandleRef);
 
   const selected = useMemo(
     () => initialChannels.find((c) => c.id === selectedId) ?? null,
@@ -112,6 +114,14 @@ export function PraxisShell({
 
   const exitVideoComposer = () => {
     setMode("home");
+    setEditingVideoId(null);
+    setChannelsPanelOpen(true);
+    setMobileChannelsOpen(true);
+  };
+
+  const goHome = () => {
+    setMode("home");
+    setSelectedId(null);
     setEditingVideoId(null);
     setChannelsPanelOpen(true);
     setMobileChannelsOpen(true);
@@ -213,23 +223,26 @@ export function PraxisShell({
       {showMobileCollapsed ? (
         <MobileChannelsCollapsedBar
           onOpen={() => setMobileChannelsOpen(true)}
+          onGoHome={goHome}
           subtitle={mobileBarSubtitle}
         />
       ) : (
         <MobileNav
           channels={initialChannels}
           onNewChannel={openNewChannel}
+          onGoHome={goHome}
           selectedId={selectedId}
           onSelectChannel={selectChannel}
           onAddVideo={openAddVideo}
         />
       )}
 
-      <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
+      <div ref={mainRowRef} className="flex min-h-0 flex-1 flex-col lg:flex-row">
         {channelsPanelOpen ? (
           <Sidebar
             channels={initialChannels}
             onNewChannel={openNewChannel}
+            onGoHome={goHome}
             selectedId={selectedId}
             onSelectChannel={selectChannel}
             onAddVideo={openAddVideo}
@@ -258,7 +271,11 @@ export function PraxisShell({
           {renderCenter()}
         </CenterPanel>
 
-        <PanelResizeHandle onMouseDown={onResizePointerDown} dragging={rightPanelDragging} />
+        <PanelResizeHandle
+          ref={resizeHandleRef}
+          onMouseDown={onResizePointerDown}
+          dragging={rightPanelDragging}
+        />
 
         <RightPanel
           contextTitle={contextTitle}

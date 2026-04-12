@@ -1,20 +1,30 @@
 "use client";
 
+import type { RefObject } from "react";
 import { useEffect, useRef, useState } from "react";
 
 const STORAGE_KEY = "praxis:rightPanelWidthPx";
 const DEFAULT = 300;
 const MIN = 220;
 const MAX = 560;
+/** Must match `PanelResizeHandle` width (`w-3` = 12px). */
+const HANDLE_WIDTH_PX = 12;
 
 function clamp(n: number) {
   return Math.min(MAX, Math.max(MIN, n));
 }
 
-export function useRightPanelWidth() {
+/**
+ * Width from the flex row’s geometry so the splitter tracks the pointer:
+ * rightPanelWidth = row.right − handleLeft − handleWidth.
+ */
+export function useRightPanelWidth(
+  flexRowRef: RefObject<HTMLElement | null>,
+  handleRef: RefObject<HTMLElement | null>,
+) {
   const [width, setWidth] = useState(DEFAULT);
   const [dragging, setDragging] = useState(false);
-  const dragRef = useRef<{ startX: number; startWidth: number } | null>(null);
+  const grabOffsetRef = useRef(0);
   const widthRef = useRef(DEFAULT);
   widthRef.current = width;
 
@@ -39,15 +49,17 @@ export function useRightPanelWidth() {
     document.body.style.userSelect = "none";
 
     const onMove = (e: MouseEvent) => {
-      if (!dragRef.current) return;
-      const dx = e.clientX - dragRef.current.startX;
-      const next = clamp(dragRef.current.startWidth + dx);
+      const rowEl = flexRowRef.current;
+      if (!rowEl) return;
+      const rowRect = rowEl.getBoundingClientRect();
+      const targetHandleLeft = e.clientX - grabOffsetRef.current;
+      const w = rowRect.right - targetHandleLeft - HANDLE_WIDTH_PX;
+      const next = clamp(w);
       widthRef.current = next;
       setWidth(next);
     };
 
     const onUp = () => {
-      dragRef.current = null;
       setDragging(false);
       try {
         localStorage.setItem(STORAGE_KEY, String(widthRef.current));
@@ -64,11 +76,15 @@ export function useRightPanelWidth() {
       document.body.style.cursor = "";
       document.body.style.userSelect = "";
     };
-  }, [dragging]);
+  }, [dragging, flexRowRef]);
 
   function onResizePointerDown(e: React.MouseEvent) {
     e.preventDefault();
-    dragRef.current = { startX: e.clientX, startWidth: widthRef.current };
+    const handleEl = handleRef.current;
+    const rowEl = flexRowRef.current;
+    if (!handleEl || !rowEl) return;
+    const handleLeft = handleEl.getBoundingClientRect().left;
+    grabOffsetRef.current = e.clientX - handleLeft;
     setDragging(true);
   }
 

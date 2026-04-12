@@ -1,14 +1,17 @@
 "use client";
 
-export function PanelResizeHandle({
-  onMouseDown,
-  dragging,
-}: {
-  onMouseDown: (e: React.MouseEvent) => void;
-  dragging: boolean;
-}) {
+import { forwardRef } from "react";
+
+export const PanelResizeHandle = forwardRef<
+  HTMLDivElement,
+  {
+    onMouseDown: (e: React.MouseEvent) => void;
+    dragging: boolean;
+  }
+>(function PanelResizeHandle({ onMouseDown, dragging }, ref) {
   return (
     <div
+      ref={ref}
       role="separator"
       aria-orientation="vertical"
       aria-label="Resize right panel"
@@ -18,4 +21,6 @@ export function PanelResizeHandle({
       onMouseDown={onMouseDown}
     />
   );
-}
+});
+
+PanelResizeHandle.displayName = "PanelResizeHandle";
