@@ -7,7 +7,7 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 ## 2026-04-12 — Supabase CLI in repo + SETUP (cannot run remote SQL without user)
 
 **Time:** (local)  
-**Commit:** *(see git)*  
+**Commit:** `750ebac`  
 **What:** `supabase` devDependency; `npx supabase init` → **`supabase/config.toml`**; scripts `db:push` / `db:pull`; **`.gitignore`** `.supabase`; **SETUP-SUPABASE** optional CLI (`login` → `link` → `db:push`) and note that agent cannot execute on user’s hosted DB without credentials.  
 **Cause:** User asked to install CLI and run SQL from assistant.  
 **Fix / outcome:** Local CLI ready; user links once and `npm run db:push`, or keep using SQL Editor (e.g. run **`002_videos.sql`** — Table Editor still shows only `channels`).  
