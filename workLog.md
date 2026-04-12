@@ -7,7 +7,7 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 ## 2026-04-12 — Initial Next.js app + channels (see git commit)
 
 **Time:** (local)  
-**Commit:** *(after `git commit` — hash below)*  
+**Commit:** `474d207`  
 **What:** Scaffolded Next.js 15 + Tailwind 4 + Supabase client; Marginalia-style 3-column shell (sidebar 260px / center max 52rem / right 300px); **New channel** button → center form (title, category dropdown, brief note, save); server action `createChannel`; SQL migration `001_channels.sql`; theme cycle light/dark/system (`next-themes`); `SETUP-SUPABASE.md`, `.env.example`; `export const dynamic = 'force-dynamic'` on home page; `git init` in `praxis-web`.  
 **Cause:** User requested first vertical slice matching mock: channels as top-level spaces + Supabase persistence path.  
 **Fix / outcome:** Build passes (`npm run build`); list loads when env + SQL applied.  
