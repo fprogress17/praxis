@@ -7,7 +7,7 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 ## 2026-04-12 — Collapse channels panel on Add video + open rail / bar
 
 **Time:** (local)  
-**Commit:** *(see git)*  
+**Commit:** `d69a5db`  
 **What:** Tapping **Add video** closes desktop sidebar (`channelsPanelOpen`) and shows `ChannelsPanelRail` with **Open channels panel**; mobile swaps full `MobileNav` for `MobileChannelsCollapsedBar` with **Open channels**. **Cancel/Save** on new video restores panels via `endVideoFlow`. **New channel** forces panels open.  
 **Cause:** User wanted left panel hidden during new video with explicit reopen control.  
 **Fix / outcome:** More horizontal space for the form; reopen without leaving flow.  
