@@ -6,12 +6,13 @@ After you **sign up** and create a **project**, you only need a few steps. **Do 
 
 1. Open [Supabase Dashboard](https://supabase.com/dashboard) → your project.
 2. Go to **SQL Editor** → **New query**.
-3. On your **computer**, open the file **`praxis-web/supabase/migrations/001_channels.sql`** in an editor, **select all the SQL** (the `create table …` block), **copy it**, and **paste that into the Supabase SQL Editor**.
-4. Click **Run**.
+3. On your **computer**, open each migration in order, **copy the full SQL**, paste into the Supabase SQL Editor, and **Run**:
+   - **`supabase/migrations/001_channels.sql`** — channels
+   - **`supabase/migrations/002_videos.sql`** — videos linked to channels (needed for **Add video**)
 
-**Important:** The SQL editor runs **SQL text only**. If you paste something like `supabase/migrations/001_channels.sql` (a path), you will get a **syntax error** — that is not SQL.
+**Important:** The SQL editor runs **SQL text only**. If you paste a **file path** instead of the file **contents**, you will get a **syntax error**.
 
-That creates the `channels` table and **Row Level Security** policies that allow the **anon** / **publishable** client key to **select** and **insert** (fine for solo dev; tighten before any public launch).
+That creates tables and **Row Level Security** policies so the **anon** / **publishable** client key can **select** and **insert** (fine for solo dev; tighten before any public launch).
 
 ## 2. Environment variables locally
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { CirclePlus } from "lucide-react";
+import { ChannelCard } from "@/components/channels/channel-card";
 import type { ChannelRow } from "@/lib/types/channel";
 import { ThemeToggle } from "@/components/theme-toggle";
 
@@ -9,11 +10,13 @@ export function Sidebar({
   onNewChannel,
   selectedId,
   onSelectChannel,
+  onAddVideo,
 }: {
   channels: ChannelRow[];
   onNewChannel: () => void;
   selectedId: string | null;
   onSelectChannel: (id: string) => void;
+  onAddVideo: (channelId: string) => void;
 }) {
   return (
     <aside className="hidden w-[260px] shrink-0 border-r border-border bg-paper lg:flex lg:flex-col">
@@ -42,27 +45,16 @@ export function Sidebar({
             No channels yet. Create one to get started.
           </p>
         ) : (
-          <div className="space-y-0.5">
-            {channels.map((ch) => {
-              const active = ch.id === selectedId;
-              return (
-                <button
-                  key={ch.id}
-                  type="button"
-                  onClick={() => onSelectChannel(ch.id)}
-                  className={`w-full rounded-md px-3 py-2 text-left text-ui transition-colors ${
-                    active
-                      ? "bg-black/6 font-medium text-foreground dark:bg-white/10"
-                      : "text-muted hover:bg-black/4 hover:text-foreground dark:hover:bg-white/5"
-                  }`}
-                >
-                  <span className="line-clamp-2">{ch.title}</span>
-                  <span className="mt-0.5 block text-label text-muted">
-                    {ch.category}
-                  </span>
-                </button>
-              );
-            })}
+          <div className="space-y-3">
+            {channels.map((ch) => (
+              <ChannelCard
+                key={ch.id}
+                channel={ch}
+                active={ch.id === selectedId}
+                onSelect={onSelectChannel}
+                onAddVideo={onAddVideo}
+              />
+            ))}
           </div>
         )}
       </div>

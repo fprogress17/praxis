@@ -4,6 +4,17 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 
 ---
 
+## 2026-04-12 — Channel card: Add video + center form + DB
+
+**Time:** (local)  
+**Commit:** *(see git)*  
+**What:** `ChannelCard` (bordered card + **Add video**); `new-video` mode: center shows channel title/brief then **New video** form (title, script, save); `createVideo` server action; `002_videos.sql` migration; SETUP lists both migrations.  
+**Cause:** User wanted in-card video action and form under channel title.  
+**Fix / outcome:** Persist videos to `videos` table after SQL run.  
+**Agent:** Auto (Cursor)
+
+---
+
 ## 2026-04-12 — Mobile: New channel visible below `lg`
 
 **Time:** (local)  

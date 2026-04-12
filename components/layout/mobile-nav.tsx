@@ -1,6 +1,7 @@
 "use client";
 
 import { ChevronDown, CirclePlus } from "lucide-react";
+import { ChannelCard } from "@/components/channels/channel-card";
 import type { ChannelRow } from "@/lib/types/channel";
 import { ThemeToggle } from "@/components/theme-toggle";
 
@@ -10,11 +11,13 @@ export function MobileNav({
   onNewChannel,
   selectedId,
   onSelectChannel,
+  onAddVideo,
 }: {
   channels: ChannelRow[];
   onNewChannel: () => void;
   selectedId: string | null;
   onSelectChannel: (id: string) => void;
+  onAddVideo: (channelId: string) => void;
 }) {
   return (
     <header className="sticky top-0 z-20 shrink-0 border-b border-border bg-paper lg:hidden">
@@ -49,25 +52,16 @@ export function MobileNav({
           {channels.length === 0 ? (
             <p className="py-2 text-meta text-muted">No channels yet — tap New channel.</p>
           ) : (
-            <div className="space-y-0.5 pt-1">
-              {channels.map((ch) => {
-                const active = ch.id === selectedId;
-                return (
-                  <button
-                    key={ch.id}
-                    type="button"
-                    onClick={() => onSelectChannel(ch.id)}
-                    className={`w-full rounded-md px-3 py-2 text-left text-ui transition-colors ${
-                      active
-                        ? "bg-black/6 font-medium text-foreground dark:bg-white/10"
-                        : "text-muted hover:bg-black/4 hover:text-foreground dark:hover:bg-white/5"
-                    }`}
-                  >
-                    <span className="line-clamp-2">{ch.title}</span>
-                    <span className="mt-0.5 block text-label text-muted">{ch.category}</span>
-                  </button>
-                );
-              })}
+            <div className="space-y-3 pt-1">
+              {channels.map((ch) => (
+                <ChannelCard
+                  key={ch.id}
+                  channel={ch}
+                  active={ch.id === selectedId}
+                  onSelect={onSelectChannel}
+                  onAddVideo={onAddVideo}
+                />
+              ))}
             </div>
           )}
         </div>

@@ -6,9 +6,10 @@ import { MobileNav } from "@/components/layout/mobile-nav";
 import { RightPanel } from "@/components/layout/right-panel";
 import { Sidebar } from "@/components/layout/sidebar";
 import { NewChannelForm } from "@/components/channels/new-channel-form";
+import { NewVideoForm } from "@/components/videos/new-video-form";
 import type { ChannelRow } from "@/lib/types/channel";
 
-type Mode = "home" | "new-channel";
+type Mode = "home" | "new-channel" | "new-video";
 
 export function PraxisShell({
   initialChannels,
@@ -25,10 +26,16 @@ export function PraxisShell({
     [initialChannels, selectedId],
   );
 
-  const contextTitle = selected?.title ?? "Workspace";
-  const contextDetail = selected
-    ? `${selected.category}${selected.brief_note ? ` · ${selected.brief_note.slice(0, 80)}${selected.brief_note.length > 80 ? "…" : ""}` : ""}`
-    : "Pick a channel or create one with New channel.";
+  const contextTitle =
+    mode === "new-video" && selected
+      ? "New video"
+      : (selected?.title ?? "Workspace");
+  const contextDetail =
+    mode === "new-video" && selected
+      ? `Adding to “${selected.title}”`
+      : selected
+        ? `${selected.category}${selected.brief_note ? ` · ${selected.brief_note.slice(0, 80)}${selected.brief_note.length > 80 ? "…" : ""}` : ""}`
+        : "Pick a channel or create one with New channel.";
 
   const openNewChannel = () => {
     setMode("new-channel");
@@ -40,6 +47,11 @@ export function PraxisShell({
     setMode("home");
   };
 
+  const openAddVideo = (channelId: string) => {
+    setSelectedId(channelId);
+    setMode("new-video");
+  };
+
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground lg:flex-row">
       <MobileNav
@@ -47,6 +59,7 @@ export function PraxisShell({
         onNewChannel={openNewChannel}
         selectedId={selectedId}
         onSelectChannel={selectChannel}
+        onAddVideo={openAddVideo}
       />
 
       <Sidebar
@@ -54,6 +67,7 @@ export function PraxisShell({
         onNewChannel={openNewChannel}
         selectedId={selectedId}
         onSelectChannel={selectChannel}
+        onAddVideo={openAddVideo}
       />
 
       <CenterPanel>
@@ -75,6 +89,23 @@ export function PraxisShell({
 
         {mode === "new-channel" ? (
           <NewChannelForm onCancel={() => setMode("home")} />
+        ) : mode === "new-video" && selected ? (
+          <div>
+            <div className="mb-3 text-micro font-semibold uppercase tracking-[0.08em] text-muted">
+              Workspace
+            </div>
+            <h1 className="font-serif text-display leading-none tracking-[-0.02em] text-foreground">
+              {selected.title}
+            </h1>
+            <p className="mt-4 max-w-[44rem] text-body leading-7 text-muted">
+              {selected.brief_note || "No brief note yet."}
+            </p>
+            <NewVideoForm
+              channelId={selected.id}
+              channelTitle={selected.title}
+              onCancel={() => setMode("home")}
+            />
+          </div>
         ) : (
           <div>
             <div className="mb-3 text-micro font-semibold uppercase tracking-[0.08em] text-muted">
@@ -91,7 +122,8 @@ export function PraxisShell({
 
             {selected ? (
               <div className="mt-10 rounded-lg border border-dashed border-border bg-surface/60 p-8 text-center text-meta text-muted">
-                Editor and channel tools go here next.
+                Use <strong className="text-foreground">Add video</strong> on the channel card to
+                add a video script, or build more tools here next.
               </div>
             ) : null}
           </div>

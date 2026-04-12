@@ -1,0 +1,51 @@
+"use server";
+
+import { createClient } from "@supabase/supabase-js";
+import { revalidatePath } from "next/cache";
+
+export type CreateVideoResult =
+  | { ok: true }
+  | { ok: false; error: string };
+
+export async function createVideo(formData: FormData): Promise<CreateVideoResult> {
+  const channel_id = String(formData.get("channel_id") ?? "").trim();
+  const title = String(formData.get("title") ?? "").trim();
+  const script = String(formData.get("script") ?? "").trim();
+
+  if (!channel_id) {
+    return { ok: false, error: "Channel is missing." };
+  }
+  if (!title) {
+    return { ok: false, error: "Video title is required." };
+  }
+
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!url || !key) {
+    return {
+      ok: false,
+      error: "Supabase is not configured. Check .env.local.",
+    };
+  }
+
+  const supabase = createClient(url, key);
+
+  const { error } = await supabase.from("videos").insert({
+    channel_id,
+    title,
+    script: script || "",
+  });
+
+  if (error) {
+    return {
+      ok: false,
+      error: error.message.includes("row-level security") || error.code === "42P01"
+        ? "Could not save video. Run supabase/migrations/002_videos.sql in the SQL Editor (see SETUP-SUPABASE.md)."
+        : error.message,
+    };
+  }
+
+  revalidatePath("/");
+  return { ok: true };
+}
