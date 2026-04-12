@@ -7,7 +7,7 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 ## 2026-04-12 — Resize splitter tracks pointer; Praxis → home
 
 **Time:** (local)  
-**Commit:** (pending)  
+**Commit:** `b28fcb6`  
 **What:** **`useRightPanelWidth`**: width from `row.right − handleLeft − 12px` so drag follows the bar; **`goHome`** + **`onGoHome`** on **Sidebar**, **MobileNav**, **MobileChannelsCollapsedBar** (tap **Praxis** → dashboard).  
 **Cause:** User wanted clearer drag-right-widens behavior and root “home” from the Praxis label.  
 **Fix / outcome:** Splitter uses flex row + handle refs; branding buttons clear channel selection and exit video flows.  
