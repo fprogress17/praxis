@@ -7,7 +7,7 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 ## 2026-04-12 — Clearer errors when `videos` table missing (schema cache)
 
 **Time:** (local)  
-**Commit:** *(see git)*  
+**Commit:** `5471fc5`  
 **What:** Map PostgREST **PGRST205** / “schema cache” / “could not find the table” to a single hint pointing at **`002_videos.sql`** (+ 003/004); **SETUP-SUPABASE** troubleshooting subsection for that error.  
 **Cause:** User saw *Could not find the table public.videos in the schema cache* on save — usually **002** not run.  
 **Fix / outcome:** Actionable in-app + doc copy.  
