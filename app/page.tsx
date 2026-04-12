@@ -26,7 +26,7 @@ export default async function HomePage() {
           .order("created_at", { ascending: false }),
         supabase
           .from("videos")
-          .select("id,channel_id,title,brief,script,created_at")
+          .select("id,channel_id,episode,title,brief,script,created_at")
           .order("created_at", { ascending: false }),
         supabase
           .from("notes")
@@ -51,6 +51,7 @@ export default async function HomePage() {
         videos = videosRes.data.map((row) => ({
           id: String(row.id),
           channel_id: String(row.channel_id),
+          episode: row.episode != null ? String(row.episode) : "",
           title: String(row.title),
           brief: row.brief != null ? String(row.brief) : "",
           script: row.script != null ? String(row.script) : "",

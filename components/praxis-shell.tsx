@@ -153,6 +153,7 @@ export function PraxisShell({
           <NewVideoForm
             channelId={selected.id}
             channelTitle={selected.title}
+            usedEpisodes={channelVideos.map((v) => v.episode)}
             onCancel={exitVideoComposer}
           />
         </div>
@@ -174,6 +175,9 @@ export function PraxisShell({
           <EditVideoForm
             video={editingVideo}
             channelTitle={selected.title}
+            usedEpisodesByOthers={channelVideos
+              .filter((v) => v.id !== editingVideo.id)
+              .map((v) => v.episode)}
             onDone={exitVideoComposer}
           />
         </div>

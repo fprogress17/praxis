@@ -44,7 +44,14 @@ export function ChannelVideoList({
               onClick={() => onSelectVideo(video)}
               className="w-full rounded-lg border border-border bg-surface p-4 text-left shadow-soft transition-colors hover:bg-black/4 dark:hover:bg-white/5"
             >
-              <div className="font-medium text-foreground">{video.title}</div>
+              <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                {video.episode ? (
+                  <span className="shrink-0 rounded bg-black/6 px-1.5 py-0.5 font-mono text-label text-muted dark:bg-white/10">
+                    {video.episode}
+                  </span>
+                ) : null}
+                <span className="font-medium text-foreground">{video.title}</span>
+              </div>
               {video.brief ? (
                 <p className="mt-1 line-clamp-2 text-body leading-6 text-muted">{video.brief}</p>
               ) : null}
