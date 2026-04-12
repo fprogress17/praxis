@@ -7,7 +7,7 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 ## 2026-04-12 — Right panel width 0 … full split (center can collapse / fill)
 
 **Time:** (local)  
-**Commit:** (pending)  
+**Commit:** `d24794f`  
 **What:** **`splitRegionRef`** wraps center + handle + right; **`useRightPanelWidth`** clamps to **`[0, splitWidth − 12px]`** (no fixed 220–560); **ResizeObserver** reclamps on resize + localStorage hydrate. **`RightPanel`**: `min-w-0 overflow-hidden`.  
 **Cause:** User wanted drag to extremes: center full vs right full beside sidebar.  
 **Fix / outcome:** Drag toward sidebar → right grows until center disappears; drag toward main → right shrinks to 0 and center fills.  
