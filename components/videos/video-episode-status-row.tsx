@@ -11,7 +11,7 @@ import {
 
 /** No fixed `height` — fixed height + `py-0` clipped text in some browsers. */
 export const compactEpisodeSelectClass =
-  "max-w-[5.5rem] min-h-[2rem] rounded border border-border bg-paper py-1.5 pl-1.5 pr-6 text-label leading-tight text-foreground shadow-sm outline-none ring-accent/20 focus:ring-1 dark:bg-paper-light/30";
+  "w-[7rem] min-w-[6.5rem] shrink-0 min-h-[2rem] rounded border border-border bg-paper py-1.5 pl-1.5 pr-6 text-label leading-tight text-foreground shadow-sm outline-none ring-accent/20 focus:ring-1 dark:bg-paper-light/30";
 
 export const compactStatusSelectClass =
   "min-h-[2rem] min-w-[8.5rem] max-w-[12rem] rounded border border-border bg-paper py-1.5 pl-1.5 pr-6 text-label leading-tight text-foreground shadow-sm outline-none ring-accent/20 focus:ring-1 dark:bg-paper-light/30";

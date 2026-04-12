@@ -118,6 +118,22 @@ export function NewVideoForm({
               className="w-full resize-y rounded-md border border-border bg-paper px-3 py-2 font-serif text-body leading-7 text-foreground shadow-sm outline-none ring-accent/30 placeholder:text-muted focus:ring-2 dark:bg-paper-light/30"
             />
           </div>
+
+          <div>
+            <label
+              htmlFor="video-next-episode-promise"
+              className="mb-1.5 block text-label font-medium text-foreground"
+            >
+              Next episode promise
+            </label>
+            <textarea
+              id="video-next-episode-promise"
+              name="next_episode_promise"
+              rows={4}
+              placeholder="What you’ll cover next time — outro tease, series hook, or CTA…"
+              className="w-full resize-y rounded-md border border-border bg-paper px-3 py-2 text-body leading-7 text-foreground shadow-sm outline-none ring-accent/30 placeholder:text-muted focus:ring-2 dark:bg-paper-light/30"
+            />
+          </div>
         </div>
 
         {error ? (

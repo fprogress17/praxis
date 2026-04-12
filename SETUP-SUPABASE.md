@@ -14,6 +14,7 @@ After you **sign up** and create a **project**, you only need a few steps. **Do 
    - **`supabase/migrations/005_notes.sql`** — **Notes** tab in the right panel (per-channel notes; UPDATE + RLS)
    - **`supabase/migrations/006_videos_episode.sql`** — **Episode** dropdown (`ep0001`…); unique per channel when non-empty
    - **`supabase/migrations/007_videos_status.sql`** — **Status** (`draft`, `published`, `skip`, `to_be_published`)
+   - **`supabase/migrations/008_videos_next_episode_promise.sql`** — **Next episode promise** text field
 
 **Important:** The SQL editor runs **SQL text only**. If you paste a **file path** instead of the file **contents**, you will get a **syntax error**.
 

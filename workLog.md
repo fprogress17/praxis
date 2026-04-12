@@ -4,6 +4,17 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 
 ---
 
+## 2026-04-12 — Next episode promise field + wider episode select
+
+**Time:** (local)  
+**Commit:** (pending)  
+**What:** **`008_videos_next_episode_promise.sql`**; **`next_episode_promise`** on **VideoRow** / **page** / **create & update**; textarea **above Save** on new/edit forms; episode select **`w-[7rem]`** so **ep0001** isn’t clipped.  
+**Cause:** User asked for “Next episode promise” section above save; horizontal clip on episode dropdown.  
+**Fix / outcome:** Stored per video; UI matches Brief/Script styling.  
+**Agent:** Auto (Cursor)
+
+---
+
 ## 2026-04-12 — Video status pulldown + compact episode/status row
 
 **Time:** (local)  

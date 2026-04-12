@@ -32,6 +32,7 @@ export async function createVideo(formData: FormData): Promise<CreateVideoResult
   const title = String(formData.get("title") ?? "").trim();
   const brief = String(formData.get("brief") ?? "").trim();
   const script = String(formData.get("script") ?? "").trim();
+  const next_episode_promise = String(formData.get("next_episode_promise") ?? "").trim();
 
   if (!channel_id) {
     return { ok: false, error: "Channel is missing." };
@@ -59,6 +60,7 @@ export async function createVideo(formData: FormData): Promise<CreateVideoResult
     title,
     brief: brief || "",
     script: script || "",
+    next_episode_promise: next_episode_promise || "",
   });
 
   if (error) {
@@ -71,15 +73,17 @@ export async function createVideo(formData: FormData): Promise<CreateVideoResult
       tableHint ??
       (dup
         ? "That episode code is already used for this channel. Choose another from the list."
-        : error.message.includes("status") || error.code === "PGRST204"
-          ? "Run supabase/migrations/007_videos_status.sql (or npm run db:push -- --yes). See SETUP-SUPABASE.md."
-          : error.message.includes("episode") || error.code === "PGRST204"
-            ? "Run supabase/migrations/006_videos_episode.sql (or npm run db:push -- --yes). See SETUP-SUPABASE.md."
-            : error.message.includes("brief") || error.code === "PGRST204"
-              ? "Run supabase/migrations/003_videos_brief.sql (and 002 if needed). See SETUP-SUPABASE.md."
-              : error.message.includes("row-level security") || error.code === "42P01"
-                ? "Run supabase/migrations/002_videos.sql (see SETUP-SUPABASE.md)."
-                : null);
+        : error.message.includes("next_episode_promise") || error.code === "PGRST204"
+          ? "Run supabase/migrations/008_videos_next_episode_promise.sql (or npm run db:push -- --yes). See SETUP-SUPABASE.md."
+          : error.message.includes("status") || error.code === "PGRST204"
+            ? "Run supabase/migrations/007_videos_status.sql (or npm run db:push -- --yes). See SETUP-SUPABASE.md."
+            : error.message.includes("episode") || error.code === "PGRST204"
+              ? "Run supabase/migrations/006_videos_episode.sql (or npm run db:push -- --yes). See SETUP-SUPABASE.md."
+              : error.message.includes("brief") || error.code === "PGRST204"
+                ? "Run supabase/migrations/003_videos_brief.sql (and 002 if needed). See SETUP-SUPABASE.md."
+                : error.message.includes("row-level security") || error.code === "42P01"
+                  ? "Run supabase/migrations/002_videos.sql (see SETUP-SUPABASE.md)."
+                  : null);
     return {
       ok: false,
       error: hint ?? error.message,
@@ -97,6 +101,7 @@ export async function updateVideo(formData: FormData): Promise<CreateVideoResult
   const title = String(formData.get("title") ?? "").trim();
   const brief = String(formData.get("brief") ?? "").trim();
   const script = String(formData.get("script") ?? "").trim();
+  const next_episode_promise = String(formData.get("next_episode_promise") ?? "").trim();
 
   if (!id) {
     return { ok: false, error: "Video id is missing." };
@@ -125,6 +130,7 @@ export async function updateVideo(formData: FormData): Promise<CreateVideoResult
       title,
       brief: brief || "",
       script: script || "",
+      next_episode_promise: next_episode_promise || "",
     })
     .eq("id", id);
 
@@ -138,13 +144,15 @@ export async function updateVideo(formData: FormData): Promise<CreateVideoResult
       tableHint ??
       (dup
         ? "That episode code is already used for this channel. Choose another from the list."
-        : error.message.includes("status") || error.code === "PGRST204"
-          ? "Run supabase/migrations/007_videos_status.sql (or npm run db:push -- --yes). See SETUP-SUPABASE.md."
-          : error.message.includes("episode") || error.code === "PGRST204"
-            ? "Run supabase/migrations/006_videos_episode.sql (or npm run db:push -- --yes). See SETUP-SUPABASE.md."
-            : error.message.includes("row-level security") || error.code === "42501"
-              ? "Run supabase/migrations/004_videos_update_policy.sql in the SQL Editor."
-              : null);
+        : error.message.includes("next_episode_promise") || error.code === "PGRST204"
+          ? "Run supabase/migrations/008_videos_next_episode_promise.sql (or npm run db:push -- --yes). See SETUP-SUPABASE.md."
+          : error.message.includes("status") || error.code === "PGRST204"
+            ? "Run supabase/migrations/007_videos_status.sql (or npm run db:push -- --yes). See SETUP-SUPABASE.md."
+            : error.message.includes("episode") || error.code === "PGRST204"
+              ? "Run supabase/migrations/006_videos_episode.sql (or npm run db:push -- --yes). See SETUP-SUPABASE.md."
+              : error.message.includes("row-level security") || error.code === "42501"
+                ? "Run supabase/migrations/004_videos_update_policy.sql in the SQL Editor."
+                : null);
     return {
       ok: false,
       error: hint ?? error.message,

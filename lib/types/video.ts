@@ -10,5 +10,7 @@ export type VideoRow = {
   title: string;
   brief: string;
   script: string;
+  /** Hook or promise for the next episode (outro CTA, series continuity). */
+  next_episode_promise: string;
   created_at: string;
 };

@@ -27,7 +27,7 @@ export default async function HomePage() {
           .order("created_at", { ascending: false }),
         supabase
           .from("videos")
-          .select("id,channel_id,episode,status,title,brief,script,created_at")
+          .select("id,channel_id,episode,status,title,brief,script,next_episode_promise,created_at")
           .order("created_at", { ascending: false }),
         supabase
           .from("notes")
@@ -59,6 +59,8 @@ export default async function HomePage() {
           title: String(row.title),
           brief: row.brief != null ? String(row.brief) : "",
           script: row.script != null ? String(row.script) : "",
+          next_episode_promise:
+            row.next_episode_promise != null ? String(row.next_episode_promise) : "",
           created_at:
             typeof row.created_at === "string"
               ? row.created_at
