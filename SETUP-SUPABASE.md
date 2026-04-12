@@ -84,6 +84,12 @@ Answer **`Y`** (or `npm run db:push -- --yes` if your CLI supports it). If a mig
 
 That means the **`videos` table is not in your project** (you have not run **`002_videos.sql`**) **or** the API cache has not picked up a table you just created.
 
-1. **Table Editor** (Supabase sidebar): check whether **`videos`** exists. If not, open **`supabase/migrations/002_videos.sql`** locally, copy **all** SQL, run it in **SQL Editor**.
+**Fastest fix (one paste):** open **`supabase/manual_apply_videos_full.sql`** in this repo, copy **the entire file**, paste into **Supabase → SQL Editor → Run**. Then confirm **`videos`** appears in **Table Editor**.
+
+Or run the separate files in order: **`002_videos.sql`**, then **`003`** only if needed, then **`004_videos_update_policy.sql`**.
+
+1. **Table Editor** (Supabase sidebar): check whether **`videos`** exists. If not, use the one-paste file above.
 2. If the table **is** listed but the app still errors, wait a short time and try again, or check **Project Settings → API** for a schema reload option (wording varies by dashboard version).
-3. Then run **`004_videos_update_policy.sql`** when you need **edit / Save changes** on a video.
+3. Confirm **`.env.local`** `NEXT_PUBLIC_SUPABASE_URL` matches the **same** project where you ran the SQL (easy to mix up two Supabase projects).
+
+The one-paste file **`manual_apply_videos_full.sql`** already includes the **UPDATE** policy (same as **`004_videos_update_policy.sql`**). If you applied **`002`** only by hand, run **`004`** separately so **Save changes** on edit works.
