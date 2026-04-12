@@ -24,3 +24,6 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+# supabase cli (after `supabase link`)
+.supabase

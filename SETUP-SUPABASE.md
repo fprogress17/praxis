@@ -16,6 +16,25 @@ After you **sign up** and create a **project**, you only need a few steps. **Do 
 
 That creates tables and **Row Level Security** policies so the **anon** / **publishable** client key can **select** and **insert** (fine for solo dev; tighten before any public launch).
 
+### Optional — Supabase CLI (installed in this repo)
+
+The **Supabase CLI** is a dev dependency. You can apply migrations from the terminal **after** linking your hosted project (needs **your** login — nothing in this repo can push to your cloud DB without that).
+
+```bash
+cd praxis-web
+npm run supabase -- --version
+npx supabase login
+npx supabase link --project-ref YOUR_PROJECT_REF
+npm run db:push
+```
+
+- **Project ref:** Dashboard URL is like `https://supabase.com/dashboard/project/<project_ref>` (also under **Project Settings → General**).
+- **`db:push`** applies SQL files under **`supabase/migrations/`** that the linked database has not applied yet.
+
+**If you already ran migrations manually in the SQL Editor** (e.g. `001` only), history may not match the CLI. Easiest fix for a missing **`videos`** table: still **paste and run `002_videos.sql`** in the **SQL Editor**. Aligning CLI history with a half-manual DB is possible but more steps (see [Supabase migration docs](https://supabase.com/docs/guides/cli/managing-environments)).
+
+**Why the assistant can’t “run SQL on your side” for your project:** your database password and account live only in Supabase. This environment has no access to your hosted Postgres unless **you** run `supabase link` (or paste SQL in the dashboard).
+
 ## 2. Environment variables locally
 
 1. In the dashboard: **Project Settings** (gear) → **API** (or **Data API** / **API keys**, depending on dashboard version).
