@@ -7,7 +7,7 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 ## 2026-04-12 — Video form: Brief between title and script
 
 **Time:** (local)  
-**Commit:** *(see git)*  
+**Commit:** `449b75b`  
 **What:** **Brief** textarea (3 rows) between video title and script; `videos.brief` in `createVideo`; `VideoRow.brief`; `002_videos.sql` includes `brief` for new installs; `003_videos_brief.sql` for existing DBs; SETUP note.  
 **Cause:** User asked for brief section between title and script.  
 **Fix / outcome:** Persist optional brief; existing projects run `003` once.  
