@@ -7,7 +7,7 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 ## 2026-04-12 — Video episode dropdown (ep0001–ep2000) + DB unique per channel
 
 **Time:** (local)  
-**Commit:** (pending)  
+**Commit:** `5f1a77e`  
 **What:** **`006_videos_episode.sql`** (`episode` text + partial unique index); **`lib/episode.ts`**; **New/Edit video** `<select>` above title; **`createVideo`/`updateVideo`**; list shows episode chip; **SETUP-SUPABASE** line.  
 **Cause:** User asked for episode selector like ep0001 on new video form.  
 **Fix / outcome:** Defaults to next free code per channel; duplicate episode blocked with clear error.  
