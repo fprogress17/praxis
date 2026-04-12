@@ -4,6 +4,16 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 
 ---
 
+## 2026-04-12 — List row: dot + anchored popover for next episode promise
+
+**Time:** (local)  
+**Commit:** `692253b`  
+**What:** **Channel video** rows split main **button** vs right **promise dot** (only if text); **`createPortal`** popover **`fixed`** with **top/left** at dot; outside click / **Escape** closes.  
+**Cause:** User wanted a small control on the card that opens a popup tied to the dot, not full-screen.  
+**Agent:** Auto (Cursor)
+
+---
+
 ## 2026-04-12 — Next episode promise field + wider episode select
 
 **Time:** (local)  
