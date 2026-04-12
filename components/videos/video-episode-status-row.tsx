@@ -9,11 +9,12 @@ import {
   type VideoStatus,
 } from "@/lib/video-status";
 
+/** No fixed `height` — fixed height + `py-0` clipped text in some browsers. */
 export const compactEpisodeSelectClass =
-  "h-7 max-w-[5.25rem] rounded border border-border bg-paper py-0 pl-1.5 pr-5 text-label text-foreground shadow-sm outline-none ring-accent/20 focus:ring-1 dark:bg-paper-light/30";
+  "max-w-[5.5rem] min-h-[2rem] rounded border border-border bg-paper py-1.5 pl-1.5 pr-6 text-label leading-tight text-foreground shadow-sm outline-none ring-accent/20 focus:ring-1 dark:bg-paper-light/30";
 
 export const compactStatusSelectClass =
-  "h-7 min-w-[8.5rem] max-w-[12rem] rounded border border-border bg-paper py-0 pl-1.5 pr-5 text-label text-foreground shadow-sm outline-none ring-accent/20 focus:ring-1 dark:bg-paper-light/30";
+  "min-h-[2rem] min-w-[8.5rem] max-w-[12rem] rounded border border-border bg-paper py-1.5 pl-1.5 pr-6 text-label leading-tight text-foreground shadow-sm outline-none ring-accent/20 focus:ring-1 dark:bg-paper-light/30";
 
 export function VideoEpisodeStatusRow({
   episodeDefault,
