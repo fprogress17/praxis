@@ -49,3 +49,11 @@ That creates tables and **Row Level Security** policies so the **anon** / **publ
 - Confirm the SQL ran without errors.
 - Confirm `.env.local` exists and vars match the dashboard (no stray quotes/spaces).
 - Read the error shown in the UI; RLS messages usually mean the migration was not applied.
+
+### “Could not find the table `public.videos` in the schema cache”
+
+That means the **`videos` table is not in your project** (you have not run **`002_videos.sql`**) **or** the API cache has not picked up a table you just created.
+
+1. **Table Editor** (Supabase sidebar): check whether **`videos`** exists. If not, open **`supabase/migrations/002_videos.sql`** locally, copy **all** SQL, run it in **SQL Editor**.
+2. If the table **is** listed but the app still errors, wait a short time and try again, or check **Project Settings → API** for a schema reload option (wording varies by dashboard version).
+3. Then run **`004_videos_update_policy.sql`** when you need **edit / Save changes** on a video.
