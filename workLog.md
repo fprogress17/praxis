@@ -4,6 +4,17 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 
 ---
 
+## 2026-04-12 — Channel center: video list + tap → edit (collapse left panel)
+
+**Time:** (local)  
+**Commit:** *(see git)*  
+**What:** Home loads `videos`; **ChannelVideoList** under channel header; tap opens **edit-video** with **EditVideoForm** (title, brief, script) and collapses channels (same rail / mobile bar as new video). **`updateVideo`** server action; **`004_videos_update_policy.sql`** for UPDATE RLS; mobile collapsed bar subtitle **New video** / **Edit video**.  
+**Cause:** User wanted saved videos visible in center and edit view with hidden left panel.  
+**Fix / outcome:** List → edit flow; run `004` in Supabase if update denied.  
+**Agent:** Auto (Cursor)
+
+---
+
 ## 2026-04-12 — Fix: unexpected server response (forms + home fetch)
 
 **Time:** (local)  

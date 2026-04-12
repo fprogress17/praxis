@@ -55,3 +55,52 @@ export async function createVideo(formData: FormData): Promise<CreateVideoResult
   revalidatePath("/");
   return { ok: true };
 }
+
+export async function updateVideo(formData: FormData): Promise<CreateVideoResult> {
+  const id = String(formData.get("id") ?? "").trim();
+  const title = String(formData.get("title") ?? "").trim();
+  const brief = String(formData.get("brief") ?? "").trim();
+  const script = String(formData.get("script") ?? "").trim();
+
+  if (!id) {
+    return { ok: false, error: "Video id is missing." };
+  }
+  if (!title) {
+    return { ok: false, error: "Video title is required." };
+  }
+
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!url || !key) {
+    return {
+      ok: false,
+      error: "Supabase is not configured. Check .env.local.",
+    };
+  }
+
+  const supabase = createClient(url, key);
+
+  const { error } = await supabase
+    .from("videos")
+    .update({
+      title,
+      brief: brief || "",
+      script: script || "",
+    })
+    .eq("id", id);
+
+  if (error) {
+    const hint =
+      error.message.includes("row-level security") || error.code === "42501"
+        ? "Run supabase/migrations/004_videos_update_policy.sql in the SQL Editor."
+        : null;
+    return {
+      ok: false,
+      error: hint ?? error.message,
+    };
+  }
+
+  revalidatePath("/");
+  return { ok: true };
+}

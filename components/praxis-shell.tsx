@@ -8,23 +8,29 @@ import { MobileNav } from "@/components/layout/mobile-nav";
 import { RightPanel } from "@/components/layout/right-panel";
 import { Sidebar } from "@/components/layout/sidebar";
 import { NewChannelForm } from "@/components/channels/new-channel-form";
+import { ChannelVideoList } from "@/components/videos/channel-video-list";
+import { EditVideoForm } from "@/components/videos/edit-video-form";
 import { NewVideoForm } from "@/components/videos/new-video-form";
 import type { ChannelRow } from "@/lib/types/channel";
+import type { VideoRow } from "@/lib/types/video";
 
-type Mode = "home" | "new-channel" | "new-video";
+type Mode = "home" | "new-channel" | "new-video" | "edit-video";
 
 export function PraxisShell({
   initialChannels,
+  initialVideos,
   supabaseConfigured,
 }: {
   initialChannels: ChannelRow[];
+  initialVideos: VideoRow[];
   supabaseConfigured: boolean;
 }) {
   const [mode, setMode] = useState<Mode>("home");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [editingVideoId, setEditingVideoId] = useState<string | null>(null);
   /** Desktop (lg+): full channels sidebar vs narrow rail with open button. */
   const [channelsPanelOpen, setChannelsPanelOpen] = useState(true);
-  /** Mobile: full top nav vs slim bar when adding a video. */
+  /** Mobile: full top nav vs slim bar when composing/editing video. */
   const [mobileChannelsOpen, setMobileChannelsOpen] = useState(true);
 
   const selected = useMemo(
@@ -32,20 +38,41 @@ export function PraxisShell({
     [initialChannels, selectedId],
   );
 
+  const channelVideos = useMemo(() => {
+    if (!selectedId) return [];
+    return initialVideos.filter((v) => v.channel_id === selectedId);
+  }, [initialVideos, selectedId]);
+
+  const editingVideo = useMemo(
+    () => (editingVideoId ? initialVideos.find((v) => v.id === editingVideoId) ?? null : null),
+    [initialVideos, editingVideoId],
+  );
+
   const contextTitle =
     mode === "new-video" && selected
       ? "New video"
-      : (selected?.title ?? "Workspace");
+      : mode === "edit-video" && editingVideo
+        ? editingVideo.title
+        : (selected?.title ?? "Workspace");
+
   const contextDetail =
     mode === "new-video" && selected
       ? `Adding to “${selected.title}”`
-      : selected
-        ? `${selected.category}${selected.brief_note ? ` · ${selected.brief_note.slice(0, 80)}${selected.brief_note.length > 80 ? "…" : ""}` : ""}`
-        : "Pick a channel or create one with New channel.";
+      : mode === "edit-video" && editingVideo && selected
+        ? `Editing in “${selected.title}”`
+        : selected
+          ? `${selected.category}${selected.brief_note ? ` · ${selected.brief_note.slice(0, 80)}${selected.brief_note.length > 80 ? "…" : ""}` : ""}`
+          : "Pick a channel or create one with New channel.";
+
+  const collapseChannelsForVideo = () => {
+    setChannelsPanelOpen(false);
+    setMobileChannelsOpen(false);
+  };
 
   const openNewChannel = () => {
     setMode("new-channel");
     setSelectedId(null);
+    setEditingVideoId(null);
     setChannelsPanelOpen(true);
     setMobileChannelsOpen(true);
   };
@@ -53,28 +80,128 @@ export function PraxisShell({
   const selectChannel = (id: string) => {
     setSelectedId(id);
     setMode("home");
+    setEditingVideoId(null);
   };
 
   const openAddVideo = (channelId: string) => {
     setSelectedId(channelId);
+    setEditingVideoId(null);
     setMode("new-video");
-    setChannelsPanelOpen(false);
-    setMobileChannelsOpen(false);
+    collapseChannelsForVideo();
   };
 
-  const endVideoFlow = () => {
+  const openEditVideo = (video: VideoRow) => {
+    setSelectedId(video.channel_id);
+    setEditingVideoId(video.id);
+    setMode("edit-video");
+    collapseChannelsForVideo();
+  };
+
+  const exitVideoComposer = () => {
     setMode("home");
+    setEditingVideoId(null);
     setChannelsPanelOpen(true);
     setMobileChannelsOpen(true);
   };
 
-  const showMobileCollapsed =
-    mode === "new-video" && !mobileChannelsOpen;
+  const videoFlowActive = mode === "new-video" || mode === "edit-video";
+  const showMobileCollapsed = videoFlowActive && !mobileChannelsOpen;
+
+  const mobileBarSubtitle =
+    mode === "edit-video" ? "Edit video" : "New video";
+
+  const renderCenter = () => {
+    if (mode === "new-channel") {
+      return <NewChannelForm onCancel={() => setMode("home")} />;
+    }
+
+    if (mode === "new-video" && selected) {
+      return (
+        <div>
+          <div className="mb-3 text-micro font-semibold uppercase tracking-[0.08em] text-muted">
+            Workspace
+          </div>
+          <h1 className="font-serif text-display leading-none tracking-[-0.02em] text-foreground">
+            {selected.title}
+          </h1>
+          <p className="mt-4 max-w-[44rem] text-body leading-7 text-muted">
+            {selected.brief_note || "No brief note yet."}
+          </p>
+          <NewVideoForm
+            channelId={selected.id}
+            channelTitle={selected.title}
+            onCancel={exitVideoComposer}
+          />
+        </div>
+      );
+    }
+
+    if (mode === "edit-video" && selected && editingVideo) {
+      return (
+        <div>
+          <div className="mb-3 text-micro font-semibold uppercase tracking-[0.08em] text-muted">
+            Workspace
+          </div>
+          <h1 className="font-serif text-display leading-none tracking-[-0.02em] text-foreground">
+            {selected.title}
+          </h1>
+          <p className="mt-4 max-w-[44rem] text-body leading-7 text-muted">
+            {selected.brief_note || "No brief note yet."}
+          </p>
+          <EditVideoForm
+            video={editingVideo}
+            channelTitle={selected.title}
+            onDone={exitVideoComposer}
+          />
+        </div>
+      );
+    }
+
+    if (mode === "edit-video" && (!selected || !editingVideo)) {
+      return (
+        <div className="rounded-lg border border-border bg-surface p-6">
+          <p className="text-body text-muted">
+            That video could not be loaded. Return to the channel and pick it from the list.
+          </p>
+          <button
+            type="button"
+            onClick={exitVideoComposer}
+            className="mt-4 rounded-md border border-border px-4 py-2 text-ui font-medium text-foreground hover:bg-black/4 dark:hover:bg-white/5"
+          >
+            Back
+          </button>
+        </div>
+      );
+    }
+
+    return (
+      <div>
+        <div className="mb-3 text-micro font-semibold uppercase tracking-[0.08em] text-muted">
+          Workspace
+        </div>
+        <h1 className="font-serif text-display leading-none tracking-[-0.02em] text-foreground">
+          {selected ? selected.title : "Home"}
+        </h1>
+        <p className="mt-4 max-w-[44rem] text-body leading-7 text-muted">
+          {selected
+            ? selected.brief_note || "No brief note yet."
+            : "Three-column layout: channels on the left, main content here, context on the right (wide screens). Use New channel to add a top-level space."}
+        </p>
+
+        {selected ? (
+          <ChannelVideoList videos={channelVideos} onSelectVideo={openEditVideo} />
+        ) : null}
+      </div>
+    );
+  };
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       {showMobileCollapsed ? (
-        <MobileChannelsCollapsedBar onOpen={() => setMobileChannelsOpen(true)} />
+        <MobileChannelsCollapsedBar
+          onOpen={() => setMobileChannelsOpen(true)}
+          subtitle={mobileBarSubtitle}
+        />
       ) : (
         <MobileNav
           channels={initialChannels}
@@ -115,47 +242,7 @@ export function PraxisShell({
             </div>
           ) : null}
 
-          {mode === "new-channel" ? (
-            <NewChannelForm onCancel={() => setMode("home")} />
-          ) : mode === "new-video" && selected ? (
-            <div>
-              <div className="mb-3 text-micro font-semibold uppercase tracking-[0.08em] text-muted">
-                Workspace
-              </div>
-              <h1 className="font-serif text-display leading-none tracking-[-0.02em] text-foreground">
-                {selected.title}
-              </h1>
-              <p className="mt-4 max-w-[44rem] text-body leading-7 text-muted">
-                {selected.brief_note || "No brief note yet."}
-              </p>
-              <NewVideoForm
-                channelId={selected.id}
-                channelTitle={selected.title}
-                onCancel={endVideoFlow}
-              />
-            </div>
-          ) : (
-            <div>
-              <div className="mb-3 text-micro font-semibold uppercase tracking-[0.08em] text-muted">
-                Workspace
-              </div>
-              <h1 className="font-serif text-display leading-none tracking-[-0.02em] text-foreground">
-                {selected ? selected.title : "Home"}
-              </h1>
-              <p className="mt-4 max-w-[44rem] text-body leading-7 text-muted">
-                {selected
-                  ? selected.brief_note || "No brief note yet."
-                  : "Three-column layout: channels on the left, main content here, context on the right (wide screens). Use New channel to add a top-level space."}
-              </p>
-
-              {selected ? (
-                <div className="mt-10 rounded-lg border border-dashed border-border bg-surface/60 p-8 text-center text-meta text-muted">
-                  Use <strong className="text-foreground">Add video</strong> on the channel card to
-                  add a video script, or build more tools here next.
-                </div>
-              ) : null}
-            </div>
-          )}
+          {renderCenter()}
         </CenterPanel>
 
         <RightPanel contextTitle={contextTitle} contextDetail={contextDetail} />

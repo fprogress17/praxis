@@ -2,13 +2,19 @@
 
 import { PanelLeftOpen } from "lucide-react";
 
-/** Shown below lg when channels nav is collapsed during new-video flow. */
-export function MobileChannelsCollapsedBar({ onOpen }: { onOpen: () => void }) {
+/** Shown below lg when channels nav is collapsed during video compose/edit. */
+export function MobileChannelsCollapsedBar({
+  onOpen,
+  subtitle = "New video",
+}: {
+  onOpen: () => void;
+  subtitle?: string;
+}) {
   return (
     <header className="sticky top-0 z-20 flex shrink-0 items-center justify-between gap-3 border-b border-border bg-paper px-4 py-3 lg:hidden">
       <div className="min-w-0">
         <div className="font-serif text-h4 leading-tight text-foreground">Praxis</div>
-        <div className="truncate text-meta text-muted">New video</div>
+        <div className="truncate text-meta text-muted">{subtitle}</div>
       </div>
       <button
         type="button"
