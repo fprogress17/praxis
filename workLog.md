@@ -7,7 +7,7 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 ## 2026-04-12 — Draggable vertical split (center / right panel, xl+)
 
 **Time:** (local)  
-**Commit:** (pending)  
+**Commit:** `60c9bc5`  
 **What:** **`useRightPanelWidth`** (localStorage `praxis:rightPanelWidthPx`, 220–560px); **`PanelResizeHandle`** between **`CenterPanel`** and **`RightPanel`**; **`RightPanel`** takes **`widthPx`**.  
 **Cause:** User asked for a horizontal-drag resize on the bar between center and right columns.  
 **Fix / outcome:** Drag the strip at the left edge of the right column (xl+); width persists across reloads.  
