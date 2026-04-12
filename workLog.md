@@ -4,6 +4,17 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 
 ---
 
+## 2026-04-12 — SETUP-SUPABASE: publishable key + SQL paste clarification
+
+**Time:** (local)  
+**Commit:** *(see git)*  
+**What:** Documented that Supabase **Publishable** key maps to `NEXT_PUBLIC_SUPABASE_ANON_KEY`; warned not to paste file **path** into SQL Editor (must paste **file contents**).  
+**Cause:** User could not find “anon public” label; SQL error from running path as query.  
+**Fix / outcome:** Clearer dashboard wording and SQL steps in `SETUP-SUPABASE.md`.  
+**Agent:** Auto (Cursor)
+
+---
+
 ## 2026-04-12 — Initial Next.js app + channels (see git commit)
 
 **Time:** (local)  
