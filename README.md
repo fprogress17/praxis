@@ -1,6 +1,6 @@
 # Praxis (browser-first)
 
-This folder is the home for the **web client** for Praxis: start here when you scaffold the app (e.g. Next.js or Vite + React).
+This folder is the **web client** for **Praxis** — a **YouTube channel creation workspace** (channels, videos, notes, future AI). Identity and roadmap: [PRODUCT_IDENTITY.md](./PRODUCT_IDENTITY.md).
 
 ## Docs in this folder
 
