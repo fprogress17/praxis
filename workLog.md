@@ -7,7 +7,7 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 ## 2026-04-12 — One-paste SQL for `videos` + SETUP troubleshooting
 
 **Time:** (local)  
-**Commit:** `005ef30`  
+**Commit:** `604bb8d`  
 **What:** **`supabase/manual_apply_videos_full.sql`** — single file combining **`002` + `003` + `004`** for Dashboard paste; **SETUP-SUPABASE** fastest-fix + env project match note.  
 **Cause:** Handoff: UI still showed missing `videos` table; user needs one clear path without hunting migration files.  
 **Fix / outcome:** Paste once after **`001`**; Table Editor should show **`videos`**.  
