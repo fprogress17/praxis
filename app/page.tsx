@@ -13,14 +13,27 @@ export default async function HomePage() {
   let channels: ChannelRow[] = [];
 
   if (supabaseConfigured) {
-    const supabase = createClient(url!, key!);
-    const { data, error } = await supabase
-      .from("channels")
-      .select("id,title,category,brief_note,created_at")
-      .order("created_at", { ascending: false });
+    try {
+      const supabase = createClient(url!, key!);
+      const { data, error } = await supabase
+        .from("channels")
+        .select("id,title,category,brief_note,created_at")
+        .order("created_at", { ascending: false });
 
-    if (!error && data) {
-      channels = data as ChannelRow[];
+      if (!error && data) {
+        channels = data.map((row) => ({
+          id: String(row.id),
+          title: String(row.title),
+          category: String(row.category),
+          brief_note: row.brief_note != null ? String(row.brief_note) : null,
+          created_at:
+            typeof row.created_at === "string"
+              ? row.created_at
+              : String(row.created_at),
+        }));
+      }
+    } catch {
+      channels = [];
     }
   }
 

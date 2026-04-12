@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createVideo } from "@/app/actions/videos";
 
@@ -14,7 +14,7 @@ export function NewVideoForm({
   onCancel: () => void;
 }) {
   const router = useRouter();
-  const [pending, startTransition] = useTransition();
+  const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -23,7 +23,8 @@ export function NewVideoForm({
     const form = e.currentTarget;
     const fd = new FormData(form);
 
-    startTransition(async () => {
+    setPending(true);
+    try {
       const result = await createVideo(fd);
       if (!result.ok) {
         setError(result.error);
@@ -32,7 +33,9 @@ export function NewVideoForm({
       form.reset();
       onCancel();
       router.refresh();
-    });
+    } finally {
+      setPending(false);
+    }
   }
 
   return (

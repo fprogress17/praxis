@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createChannel } from "@/app/actions/channels";
 import { CHANNEL_CATEGORIES } from "@/lib/channel-categories";
 
 export function NewChannelForm({ onCancel }: { onCancel: () => void }) {
   const router = useRouter();
-  const [pending, startTransition] = useTransition();
+  const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -16,7 +16,8 @@ export function NewChannelForm({ onCancel }: { onCancel: () => void }) {
     const form = e.currentTarget;
     const fd = new FormData(form);
 
-    startTransition(async () => {
+    setPending(true);
+    try {
       const result = await createChannel(fd);
       if (!result.ok) {
         setError(result.error);
@@ -25,7 +26,9 @@ export function NewChannelForm({ onCancel }: { onCancel: () => void }) {
       form.reset();
       onCancel();
       router.refresh();
-    });
+    } finally {
+      setPending(false);
+    }
   }
 
   return (

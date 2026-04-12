@@ -4,6 +4,17 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 
 ---
 
+## 2026-04-12 — Fix: unexpected server response (forms + home fetch)
+
+**Time:** (local)  
+**Commit:** *(see git)*  
+**What:** Replaced `startTransition(async () => … server action)` with `useState` pending + `try/finally` in **NewVideoForm** and **NewChannelForm** (async inside `startTransition` breaks server-action / RSC flow in Next 15). Wrapped home `channels` fetch in **try/catch** and normalized rows to plain strings for safe RSC props.  
+**Cause:** Runtime overlay *An unexpected response was received from the server* at `NewVideoForm` / refresh path.  
+**Fix / outcome:** Stable submit + safer server render on Supabase errors.  
+**Agent:** Auto (Cursor)
+
+---
+
 ## 2026-04-12 — Collapse channels panel on Add video + open rail / bar
 
 **Time:** (local)  
