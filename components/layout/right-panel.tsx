@@ -27,7 +27,7 @@ export function RightPanel({
 
   return (
     <aside
-      className="hidden shrink-0 bg-paper xl:flex xl:flex-col"
+      className="hidden min-w-0 shrink-0 overflow-hidden bg-paper xl:flex xl:flex-col"
       style={{ width: widthPx }}
     >
       <div className="border-b border-border px-6 py-6">

@@ -38,10 +38,10 @@ export function PraxisShell({
   /** Mobile: full top nav vs slim bar when composing/editing video. */
   const [mobileChannelsOpen, setMobileChannelsOpen] = useState(true);
 
-  const mainRowRef = useRef<HTMLDivElement>(null);
+  const splitRegionRef = useRef<HTMLDivElement>(null);
   const resizeHandleRef = useRef<HTMLDivElement>(null);
   const { widthPx: rightPanelWidthPx, dragging: rightPanelDragging, onResizePointerDown } =
-    useRightPanelWidth(mainRowRef, resizeHandleRef);
+    useRightPanelWidth(splitRegionRef, resizeHandleRef);
 
   const selected = useMemo(
     () => initialChannels.find((c) => c.id === selectedId) ?? null,
@@ -237,7 +237,7 @@ export function PraxisShell({
         />
       )}
 
-      <div ref={mainRowRef} className="flex min-h-0 flex-1 flex-col lg:flex-row">
+      <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
         {channelsPanelOpen ? (
           <Sidebar
             channels={initialChannels}
@@ -251,40 +251,45 @@ export function PraxisShell({
           <ChannelsPanelRail onOpen={() => setChannelsPanelOpen(true)} />
         )}
 
-        <CenterPanel>
-          {!supabaseConfigured ? (
-            <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-body text-amber-950 dark:border-amber-900/40 dark:bg-amber-950/30 dark:text-amber-100">
-              <p className="font-medium">Supabase env vars missing</p>
-              <p className="mt-2 text-meta leading-6 opacity-90">
-                Copy <code className="rounded bg-black/5 px-1 dark:bg-white/10">.env.example</code>{" "}
-                to <code className="rounded bg-black/5 px-1 dark:bg-white/10">.env.local</code> and
-                add your project URL and anon key. Then run the SQL in{" "}
-                <code className="rounded bg-black/5 px-1 dark:bg-white/10">
-                  supabase/migrations/001_channels.sql
-                </code>{" "}
-                (see <code className="rounded bg-black/5 px-1 dark:bg-white/10">SETUP-SUPABASE.md</code>
-                ).
-              </p>
-            </div>
-          ) : null}
+        <div
+          ref={splitRegionRef}
+          className="flex min-h-0 min-w-0 flex-1 flex-col lg:flex-row"
+        >
+          <CenterPanel>
+            {!supabaseConfigured ? (
+              <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-body text-amber-950 dark:border-amber-900/40 dark:bg-amber-950/30 dark:text-amber-100">
+                <p className="font-medium">Supabase env vars missing</p>
+                <p className="mt-2 text-meta leading-6 opacity-90">
+                  Copy <code className="rounded bg-black/5 px-1 dark:bg-white/10">.env.example</code>{" "}
+                  to <code className="rounded bg-black/5 px-1 dark:bg-white/10">.env.local</code> and
+                  add your project URL and anon key. Then run the SQL in{" "}
+                  <code className="rounded bg-black/5 px-1 dark:bg-white/10">
+                    supabase/migrations/001_channels.sql
+                  </code>{" "}
+                  (see <code className="rounded bg-black/5 px-1 dark:bg-white/10">SETUP-SUPABASE.md</code>
+                  ).
+                </p>
+              </div>
+            ) : null}
 
-          {renderCenter()}
-        </CenterPanel>
+            {renderCenter()}
+          </CenterPanel>
 
-        <PanelResizeHandle
-          ref={resizeHandleRef}
-          onMouseDown={onResizePointerDown}
-          dragging={rightPanelDragging}
-        />
+          <PanelResizeHandle
+            ref={resizeHandleRef}
+            onMouseDown={onResizePointerDown}
+            dragging={rightPanelDragging}
+          />
 
-        <RightPanel
-          contextTitle={contextTitle}
-          contextDetail={contextDetail}
-          channelId={selectedId}
-          channelNotes={channelNotes}
-          supabaseConfigured={supabaseConfigured}
-          widthPx={rightPanelWidthPx}
-        />
+          <RightPanel
+            contextTitle={contextTitle}
+            contextDetail={contextDetail}
+            channelId={selectedId}
+            channelNotes={channelNotes}
+            supabaseConfigured={supabaseConfigured}
+            widthPx={rightPanelWidthPx}
+          />
+        </div>
       </div>
     </div>
   );

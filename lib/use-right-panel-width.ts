@@ -5,21 +5,21 @@ import { useEffect, useRef, useState } from "react";
 
 const STORAGE_KEY = "praxis:rightPanelWidthPx";
 const DEFAULT = 300;
-const MIN = 220;
-const MAX = 560;
 /** Must match `PanelResizeHandle` width (`w-3` = 12px). */
 const HANDLE_WIDTH_PX = 12;
 
-function clamp(n: number) {
-  return Math.min(MAX, Math.max(MIN, n));
+function clampToSplit(w: number, maxR: number) {
+  const cap = Math.max(0, maxR);
+  return Math.min(cap, Math.max(0, w));
 }
 
 /**
- * Width from the flex row’s geometry so the splitter tracks the pointer:
- * rightPanelWidth = row.right − handleLeft − handleWidth.
+ * Right panel width only (not including the handle). Range is 0 … (split width − handle):
+ * - 0 → center uses all space (center “full”)
+ * - max → center collapses, right uses the rest (right “full” beside sidebar)
  */
 export function useRightPanelWidth(
-  flexRowRef: RefObject<HTMLElement | null>,
+  splitRegionRef: RefObject<HTMLElement | null>,
   handleRef: RefObject<HTMLElement | null>,
 ) {
   const [width, setWidth] = useState(DEFAULT);
@@ -27,20 +27,49 @@ export function useRightPanelWidth(
   const grabOffsetRef = useRef(0);
   const widthRef = useRef(DEFAULT);
   widthRef.current = width;
+  const didHydrateRef = useRef(false);
 
   useEffect(() => {
-    try {
-      const s = localStorage.getItem(STORAGE_KEY);
-      if (s) {
-        const w = parseInt(s, 10);
-        if (!Number.isNaN(w)) {
-          setWidth(clamp(w));
+    const el = splitRegionRef.current;
+    if (!el) return;
+
+    const apply = () => {
+      const maxR = Math.max(0, el.getBoundingClientRect().width - HANDLE_WIDTH_PX);
+
+      if (!didHydrateRef.current) {
+        didHydrateRef.current = true;
+        try {
+          const s = localStorage.getItem(STORAGE_KEY);
+          if (s) {
+            const w = parseInt(s, 10);
+            if (!Number.isNaN(w)) {
+              const next = clampToSplit(w, maxR);
+              widthRef.current = next;
+              setWidth(next);
+              return;
+            }
+          }
+        } catch {
+          /* ignore */
         }
+        const next = clampToSplit(DEFAULT, maxR);
+        widthRef.current = next;
+        setWidth(next);
+        return;
       }
-    } catch {
-      /* ignore */
-    }
-  }, []);
+
+      setWidth((prev) => {
+        const next = clampToSplit(prev, maxR);
+        widthRef.current = next;
+        return next;
+      });
+    };
+
+    const ro = new ResizeObserver(apply);
+    ro.observe(el);
+    apply();
+    return () => ro.disconnect();
+  }, [splitRegionRef]);
 
   useEffect(() => {
     if (!dragging) return;
@@ -49,12 +78,13 @@ export function useRightPanelWidth(
     document.body.style.userSelect = "none";
 
     const onMove = (e: MouseEvent) => {
-      const rowEl = flexRowRef.current;
-      if (!rowEl) return;
-      const rowRect = rowEl.getBoundingClientRect();
+      const splitEl = splitRegionRef.current;
+      if (!splitEl) return;
+      const splitRect = splitEl.getBoundingClientRect();
+      const maxR = Math.max(0, splitRect.width - HANDLE_WIDTH_PX);
       const targetHandleLeft = e.clientX - grabOffsetRef.current;
-      const w = rowRect.right - targetHandleLeft - HANDLE_WIDTH_PX;
-      const next = clamp(w);
+      const w = splitRect.right - targetHandleLeft - HANDLE_WIDTH_PX;
+      const next = clampToSplit(w, maxR);
       widthRef.current = next;
       setWidth(next);
     };
@@ -76,13 +106,13 @@ export function useRightPanelWidth(
       document.body.style.cursor = "";
       document.body.style.userSelect = "";
     };
-  }, [dragging, flexRowRef]);
+  }, [dragging, splitRegionRef]);
 
   function onResizePointerDown(e: React.MouseEvent) {
     e.preventDefault();
     const handleEl = handleRef.current;
-    const rowEl = flexRowRef.current;
-    if (!handleEl || !rowEl) return;
+    const splitEl = splitRegionRef.current;
+    if (!handleEl || !splitEl) return;
     const handleLeft = handleEl.getBoundingClientRect().left;
     grabOffsetRef.current = e.clientX - handleLeft;
     setDragging(true);
