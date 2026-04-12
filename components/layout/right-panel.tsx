@@ -66,7 +66,9 @@ export function RightPanel({
           ) : null}
 
           {tab === "AI" ? (
-            <p className="text-meta leading-6 text-muted">AI-assisted signals for this channel will live here.</p>
+            <p className="text-meta leading-6 text-muted">
+              Titles, hooks, outlines, and descriptions for this channel — your own chat here later (API on the server, not embedded ChatGPT).
+            </p>
           ) : null}
         </div>
 
@@ -77,7 +79,7 @@ export function RightPanel({
             </div>
             <div className="mt-3 font-serif text-h4 text-foreground">Channel lens</div>
             <p className="mt-3 text-body leading-7 text-muted">
-              Notes are scoped to the selected channel. Links and AI stay placeholders for now.
+              Notes follow the selected channel. Links and a creator-focused AI chat are planned next.
             </p>
             <div className="mt-5 space-y-3">
               <div className="rounded-md border border-border bg-paper px-3 py-3 dark:bg-paper-light/50">

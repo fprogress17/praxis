@@ -4,6 +4,17 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 
 ---
 
+## 2026-04-12 — Product identity: YouTube creation workspace + PRODUCT_IDENTITY.md
+
+**Time:** (local)  
+**Commit:** (pending)  
+**What:** **`PRODUCT_IDENTITY.md`** — Praxis = **YouTube channel creation** now; **Personal project memory** deferred to a later phase; roadmap, terminology, AI-tab suggestions reframed for creators; **REQUIREMENTS**, **README**, **STACK**, **`layout` metadata**, **sidebar / mobile / home / right panel** copy updated.  
+**Cause:** User clarified pivot from Swift-era “personal project memory” to a YouTube-focused tool while keeping the Praxis name.  
+**Fix / outcome:** Single source of truth for identity; UI tagline and placeholders match.  
+**Agent:** Auto (Cursor)
+
+---
+
 ## 2026-04-12 — Right panel width 0 … full split (center can collapse / fill)
 
 **Time:** (local)  

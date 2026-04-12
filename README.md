@@ -6,6 +6,7 @@ This folder is the home for the **web client** for Praxis: start here when you s
 
 | File | Purpose |
 |------|---------|
+| [PRODUCT_IDENTITY.md](./PRODUCT_IDENTITY.md) | **What Praxis is now** (YouTube creation focus), history, roadmap, AI-tab direction |
 | [REQUIREMENTS_AND_DECISIONS.md](./REQUIREMENTS_AND_DECISIONS.md) | Product priorities, constraints, and how choices were made vs alternatives |
 | [EDITOR.md](./EDITOR.md) | Editor choice (Lexical) and persistence strategy (remote-first vs local JSON) |
 | [STACK.md](./STACK.md) | Default stack (Next, Supabase, Tailwind, Lexical) + Supabase env setup; **do not share secrets in chat** |

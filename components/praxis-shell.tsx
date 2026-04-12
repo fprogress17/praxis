@@ -208,7 +208,7 @@ export function PraxisShell({
         <p className="mt-4 max-w-[44rem] text-body leading-7 text-muted">
           {selected
             ? selected.brief_note || "No brief note yet."
-            : "Three-column layout: channels on the left, main content here, context on the right (wide screens). Use New channel to add a top-level space."}
+            : "Plan and draft YouTube videos by channel: pick or add a channel on the left, add videos in the center, notes and future AI on the right (wide screens)."}
         </p>
 
         {selected ? (

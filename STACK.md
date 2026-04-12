@@ -2,7 +2,7 @@
 
 *Last updated: 2026-04-12*
 
-Goal: **speed and low friction**. Stack can change when something else is faster — this file is the **current default**, not a religion.
+Goal: **speed and low friction**. Stack can change when something else is faster — this file is the **current default**, not a religion. Product identity: **[PRODUCT_IDENTITY.md](./PRODUCT_IDENTITY.md)** (YouTube channel creation workspace).
 
 ---
 

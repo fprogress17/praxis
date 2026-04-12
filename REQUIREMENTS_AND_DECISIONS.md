@@ -1,16 +1,16 @@
 # Praxis — Requirements & decisions (browser-first iteration)
 
-*Last updated: 2026-04-12*
+*Last updated: 2026-04-12 (identity: see [PRODUCT_IDENTITY.md](./PRODUCT_IDENTITY.md))*
 
 This document records **what we want now**, **what we explicitly defer**, and **why we chose this path** over alternatives. It is a living note for the **`praxis-web`** effort; it does not replace a full product spec.
 
 ---
 
-## 1. Product intent (unchanged in spirit)
+## 1. Product intent
 
-Praxis is a **personal project memory system**: richer than a todo list — projects, progress history, failures/lessons, relationships, notes, resources, and timeline-style views **over time**.
+**Current focus (active):** Praxis is a **YouTube channel creation workspace** — channels as show-level buckets, videos with title/brief/script, per-channel notes, and room for an AI tab aimed at creators. See **[PRODUCT_IDENTITY.md](./PRODUCT_IDENTITY.md)** for the full narrative (including the earlier “Personal project memory” vision and why it is deferred).
 
-For **this iteration**, we are **not** implementing the full original spec up front. We grow **basic functionality and UI first**, then add screens and features **as needed while using the app**.
+For **this iteration**, we are **not** implementing every future idea up front. We grow **basic functionality and UI first**, then add features **as needed while using the app**.
 
 ---
 

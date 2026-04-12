@@ -4,7 +4,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Praxis",
-  description: "Personal project memory — channels, notes, and history.",
+  description: "YouTube channel creation workspace — plan videos, scripts, and notes by channel.",
 };
 
 export default function RootLayout({

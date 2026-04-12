@@ -30,7 +30,7 @@ export function MobileNav({
           className="min-w-0 rounded-md text-left outline-none ring-offset-2 ring-offset-paper transition-opacity hover:opacity-85 focus-visible:ring-2 focus-visible:ring-accent dark:ring-offset-paper"
         >
           <div className="font-serif text-h4 leading-tight text-foreground">Praxis</div>
-          <div className="truncate text-meta text-muted">Personal project memory</div>
+          <div className="truncate text-meta text-muted">YouTube channel creation workspace</div>
         </button>
         <div className="flex shrink-0 items-center gap-2">
           <button
