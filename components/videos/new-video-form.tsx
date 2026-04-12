@@ -68,6 +68,22 @@ export function NewVideoForm({
 
           <div>
             <label
+              htmlFor="video-brief"
+              className="mb-1.5 block text-label font-medium text-foreground"
+            >
+              Brief
+            </label>
+            <textarea
+              id="video-brief"
+              name="brief"
+              rows={3}
+              placeholder="One-line pitch, hook, or what this video is about…"
+              className="w-full resize-y rounded-md border border-border bg-paper px-3 py-2 text-body leading-7 text-foreground shadow-sm outline-none ring-accent/30 placeholder:text-muted focus:ring-2 dark:bg-paper-light/30"
+            />
+          </div>
+
+          <div>
+            <label
               htmlFor="video-script"
               className="mb-1.5 block text-label font-medium text-foreground"
             >

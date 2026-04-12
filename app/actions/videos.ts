@@ -10,6 +10,7 @@ export type CreateVideoResult =
 export async function createVideo(formData: FormData): Promise<CreateVideoResult> {
   const channel_id = String(formData.get("channel_id") ?? "").trim();
   const title = String(formData.get("title") ?? "").trim();
+  const brief = String(formData.get("brief") ?? "").trim();
   const script = String(formData.get("script") ?? "").trim();
 
   if (!channel_id) {
@@ -34,15 +35,20 @@ export async function createVideo(formData: FormData): Promise<CreateVideoResult
   const { error } = await supabase.from("videos").insert({
     channel_id,
     title,
+    brief: brief || "",
     script: script || "",
   });
 
   if (error) {
+    const hint =
+      error.message.includes("brief") || error.code === "PGRST204"
+        ? "Run supabase/migrations/003_videos_brief.sql (and 002 if needed). See SETUP-SUPABASE.md."
+        : error.message.includes("row-level security") || error.code === "42P01"
+          ? "Run supabase/migrations/002_videos.sql (see SETUP-SUPABASE.md)."
+          : null;
     return {
       ok: false,
-      error: error.message.includes("row-level security") || error.code === "42P01"
-        ? "Could not save video. Run supabase/migrations/002_videos.sql in the SQL Editor (see SETUP-SUPABASE.md)."
-        : error.message,
+      error: hint ?? error.message,
     };
   }
 

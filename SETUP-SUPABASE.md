@@ -9,6 +9,7 @@ After you **sign up** and create a **project**, you only need a few steps. **Do 
 3. On your **computer**, open each migration in order, **copy the full SQL**, paste into the Supabase SQL Editor, and **Run**:
    - **`supabase/migrations/001_channels.sql`** — channels
    - **`supabase/migrations/002_videos.sql`** — videos linked to channels (needed for **Add video**)
+   - **`supabase/migrations/003_videos_brief.sql`** — only if you already ran an older `002` without `brief`; fresh `002` includes `brief`
 
 **Important:** The SQL editor runs **SQL text only**. If you paste a **file path** instead of the file **contents**, you will get a **syntax error**.
 

@@ -4,6 +4,7 @@ create table if not exists public.videos (
   id uuid primary key default gen_random_uuid(),
   channel_id uuid not null references public.channels (id) on delete cascade,
   title text not null,
+  brief text not null default '',
   script text not null default '',
   created_at timestamptz not null default now()
 );
