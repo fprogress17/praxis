@@ -13,17 +13,23 @@ export function RightPanel({
   channelId = null,
   channelNotes = [],
   supabaseConfigured = false,
+  widthPx = 300,
 }: {
   contextTitle?: string;
   contextDetail?: string;
   channelId?: string | null;
   channelNotes?: NoteRow[];
   supabaseConfigured?: boolean;
+  /** Width of the right column in pixels (set by drag handle on xl+). */
+  widthPx?: number;
 }) {
   const [tab, setTab] = useState<TabId>("Notes");
 
   return (
-    <aside className="hidden w-[300px] shrink-0 border-l border-border bg-paper xl:flex xl:flex-col">
+    <aside
+      className="hidden shrink-0 bg-paper xl:flex xl:flex-col"
+      style={{ width: widthPx }}
+    >
       <div className="border-b border-border px-6 py-6">
         <div className="font-serif text-h4 text-foreground">Praxis</div>
         <div className="mt-2 flex flex-wrap gap-2" role="tablist" aria-label="Right panel">

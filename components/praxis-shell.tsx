@@ -5,8 +5,10 @@ import { ChannelsPanelRail } from "@/components/layout/channels-panel-rail";
 import { CenterPanel } from "@/components/layout/center-panel";
 import { MobileChannelsCollapsedBar } from "@/components/layout/mobile-channels-collapsed-bar";
 import { MobileNav } from "@/components/layout/mobile-nav";
+import { PanelResizeHandle } from "@/components/layout/panel-resize-handle";
 import { RightPanel } from "@/components/layout/right-panel";
 import { Sidebar } from "@/components/layout/sidebar";
+import { useRightPanelWidth } from "@/lib/use-right-panel-width";
 import { NewChannelForm } from "@/components/channels/new-channel-form";
 import { ChannelVideoList } from "@/components/videos/channel-video-list";
 import { EditVideoForm } from "@/components/videos/edit-video-form";
@@ -35,6 +37,9 @@ export function PraxisShell({
   const [channelsPanelOpen, setChannelsPanelOpen] = useState(true);
   /** Mobile: full top nav vs slim bar when composing/editing video. */
   const [mobileChannelsOpen, setMobileChannelsOpen] = useState(true);
+
+  const { widthPx: rightPanelWidthPx, dragging: rightPanelDragging, onResizePointerDown } =
+    useRightPanelWidth();
 
   const selected = useMemo(
     () => initialChannels.find((c) => c.id === selectedId) ?? null,
@@ -253,12 +258,15 @@ export function PraxisShell({
           {renderCenter()}
         </CenterPanel>
 
+        <PanelResizeHandle onMouseDown={onResizePointerDown} dragging={rightPanelDragging} />
+
         <RightPanel
           contextTitle={contextTitle}
           contextDetail={contextDetail}
           channelId={selectedId}
           channelNotes={channelNotes}
           supabaseConfigured={supabaseConfigured}
+          widthPx={rightPanelWidthPx}
         />
       </div>
     </div>
