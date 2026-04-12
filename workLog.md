@@ -4,6 +4,17 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 
 ---
 
+## 2026-04-12 — Mobile: New channel visible below `lg`
+
+**Time:** (local)  
+**Commit:** *(see git)*  
+**What:** Added `MobileNav` (sticky top bar): **New channel**, compact theme toggle, collapsible **Channels** list. Shell is `flex-col` on small screens / `lg:flex-row` on large. `ThemeToggle` supports `compact` icon-only.  
+**Cause:** Sidebar used `hidden lg:flex`, so **New channel** disappeared on viewports under 1024px.  
+**Fix / outcome:** Primary actions available on phone/narrow windows; desktop unchanged.  
+**Agent:** Auto (Cursor)
+
+---
+
 ## 2026-04-12 — SETUP-SUPABASE: publishable key + SQL paste clarification
 
 **Time:** (local)  

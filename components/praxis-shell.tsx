@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { CenterPanel } from "@/components/layout/center-panel";
+import { MobileNav } from "@/components/layout/mobile-nav";
 import { RightPanel } from "@/components/layout/right-panel";
 import { Sidebar } from "@/components/layout/sidebar";
 import { NewChannelForm } from "@/components/channels/new-channel-form";
@@ -29,19 +30,30 @@ export function PraxisShell({
     ? `${selected.category}${selected.brief_note ? ` · ${selected.brief_note.slice(0, 80)}${selected.brief_note.length > 80 ? "…" : ""}` : ""}`
     : "Pick a channel or create one with New channel.";
 
+  const openNewChannel = () => {
+    setMode("new-channel");
+    setSelectedId(null);
+  };
+
+  const selectChannel = (id: string) => {
+    setSelectedId(id);
+    setMode("home");
+  };
+
   return (
-    <div className="flex min-h-screen bg-background text-foreground">
+    <div className="flex min-h-screen flex-col bg-background text-foreground lg:flex-row">
+      <MobileNav
+        channels={initialChannels}
+        onNewChannel={openNewChannel}
+        selectedId={selectedId}
+        onSelectChannel={selectChannel}
+      />
+
       <Sidebar
         channels={initialChannels}
-        onNewChannel={() => {
-          setMode("new-channel");
-          setSelectedId(null);
-        }}
+        onNewChannel={openNewChannel}
         selectedId={selectedId}
-        onSelectChannel={(id) => {
-          setSelectedId(id);
-          setMode("home");
-        }}
+        onSelectChannel={selectChannel}
       />
 
       <CenterPanel>

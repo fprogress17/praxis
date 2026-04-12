@@ -1,0 +1,77 @@
+"use client";
+
+import { ChevronDown, CirclePlus } from "lucide-react";
+import type { ChannelRow } from "@/lib/types/channel";
+import { ThemeToggle } from "@/components/theme-toggle";
+
+/** Visible below `lg` — desktop sidebar is hidden there, so this carries New channel + channel list. */
+export function MobileNav({
+  channels,
+  onNewChannel,
+  selectedId,
+  onSelectChannel,
+}: {
+  channels: ChannelRow[];
+  onNewChannel: () => void;
+  selectedId: string | null;
+  onSelectChannel: (id: string) => void;
+}) {
+  return (
+    <header className="sticky top-0 z-20 shrink-0 border-b border-border bg-paper lg:hidden">
+      <div className="flex items-center justify-between gap-2 px-4 py-3">
+        <div className="min-w-0">
+          <div className="font-serif text-h4 leading-tight text-foreground">Praxis</div>
+          <div className="truncate text-meta text-muted">Personal project memory</div>
+        </div>
+        <div className="flex shrink-0 items-center gap-2">
+          <button
+            type="button"
+            onClick={onNewChannel}
+            className="flex items-center gap-1.5 rounded-lg border border-border bg-surface px-3 py-2 text-label font-medium text-foreground shadow-soft"
+          >
+            <CirclePlus className="h-4 w-4 shrink-0" strokeWidth={1.75} aria-hidden />
+            <span className="hidden min-[380px]:inline">New channel</span>
+            <span className="min-[380px]:hidden">New</span>
+          </button>
+          <ThemeToggle compact />
+        </div>
+      </div>
+
+      <details className="border-t border-border px-4 py-2 group">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-2 py-2 text-ui font-medium text-foreground marker:content-none [&::-webkit-details-marker]:hidden">
+          <span>
+            Channels
+            <span className="ml-1.5 font-normal text-muted">({channels.length})</span>
+          </span>
+          <ChevronDown className="h-4 w-4 shrink-0 text-muted transition-transform group-open:rotate-180" />
+        </summary>
+        <div className="max-h-[40vh] overflow-y-auto pb-2">
+          {channels.length === 0 ? (
+            <p className="py-2 text-meta text-muted">No channels yet — tap New channel.</p>
+          ) : (
+            <div className="space-y-0.5 pt-1">
+              {channels.map((ch) => {
+                const active = ch.id === selectedId;
+                return (
+                  <button
+                    key={ch.id}
+                    type="button"
+                    onClick={() => onSelectChannel(ch.id)}
+                    className={`w-full rounded-md px-3 py-2 text-left text-ui transition-colors ${
+                      active
+                        ? "bg-black/6 font-medium text-foreground dark:bg-white/10"
+                        : "text-muted hover:bg-black/4 hover:text-foreground dark:hover:bg-white/5"
+                    }`}
+                  >
+                    <span className="line-clamp-2">{ch.title}</span>
+                    <span className="mt-0.5 block text-label text-muted">{ch.category}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </details>
+    </header>
+  );
+}
