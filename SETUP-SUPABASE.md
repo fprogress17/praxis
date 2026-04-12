@@ -11,6 +11,7 @@ After you **sign up** and create a **project**, you only need a few steps. **Do 
    - **`supabase/migrations/002_videos.sql`** — videos linked to channels (needed for **Add video**)
    - **`supabase/migrations/003_videos_brief.sql`** — only if you already ran an older `002` without `brief`; fresh `002` includes `brief`
    - **`supabase/migrations/004_videos_update_policy.sql`** — allows **editing** saved videos (UPDATE + RLS); run if **Save changes** on edit fails with a permission / RLS error
+   - **`supabase/migrations/005_notes.sql`** — **Notes** tab in the right panel (per-channel notes; UPDATE + RLS)
 
 **Important:** The SQL editor runs **SQL text only**. If you paste a **file path** instead of the file **contents**, you will get a **syntax error**.
 

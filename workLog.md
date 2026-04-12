@@ -4,6 +4,17 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 
 ---
 
+## 2026-04-12 — Right panel: Notes tab (+ inline editor, list) + `005_notes`
+
+**Time:** (local)  
+**Commit:** `c6703f1`  
+**What:** **`005_notes.sql`** (`public.notes` + RLS); **`app/actions/notes.ts`**; **`NotesSection`** (+ button, title/body/Save inline, list); **`RightPanel`** tab buttons (Notes / Links / AI); **page** loads notes.  
+**Cause:** User asked for inline notes in the right column under Notes, Links, AI.  
+**Fix / outcome:** Channel-scoped notes; **`npm run db:push -- --yes`** applies **`005_notes.sql`**.  
+**Agent:** Auto (Cursor)
+
+---
+
 ## 2026-04-12 — One-paste SQL for `videos` + SETUP troubleshooting
 
 **Time:** (local)  

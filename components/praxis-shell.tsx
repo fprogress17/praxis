@@ -12,6 +12,7 @@ import { ChannelVideoList } from "@/components/videos/channel-video-list";
 import { EditVideoForm } from "@/components/videos/edit-video-form";
 import { NewVideoForm } from "@/components/videos/new-video-form";
 import type { ChannelRow } from "@/lib/types/channel";
+import type { NoteRow } from "@/lib/types/note";
 import type { VideoRow } from "@/lib/types/video";
 
 type Mode = "home" | "new-channel" | "new-video" | "edit-video";
@@ -19,10 +20,12 @@ type Mode = "home" | "new-channel" | "new-video" | "edit-video";
 export function PraxisShell({
   initialChannels,
   initialVideos,
+  initialNotes,
   supabaseConfigured,
 }: {
   initialChannels: ChannelRow[];
   initialVideos: VideoRow[];
+  initialNotes: NoteRow[];
   supabaseConfigured: boolean;
 }) {
   const [mode, setMode] = useState<Mode>("home");
@@ -42,6 +45,11 @@ export function PraxisShell({
     if (!selectedId) return [];
     return initialVideos.filter((v) => v.channel_id === selectedId);
   }, [initialVideos, selectedId]);
+
+  const channelNotes = useMemo(() => {
+    if (!selectedId) return [];
+    return initialNotes.filter((n) => n.channel_id === selectedId);
+  }, [initialNotes, selectedId]);
 
   const editingVideo = useMemo(
     () => (editingVideoId ? initialVideos.find((v) => v.id === editingVideoId) ?? null : null),
@@ -245,7 +253,13 @@ export function PraxisShell({
           {renderCenter()}
         </CenterPanel>
 
-        <RightPanel contextTitle={contextTitle} contextDetail={contextDetail} />
+        <RightPanel
+          contextTitle={contextTitle}
+          contextDetail={contextDetail}
+          channelId={selectedId}
+          channelNotes={channelNotes}
+          supabaseConfigured={supabaseConfigured}
+        />
       </div>
     </div>
   );
