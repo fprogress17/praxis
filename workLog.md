@@ -7,7 +7,7 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 ## 2026-04-12 — Idempotent SQL migrations (`db push` vs existing policies)
 
 **Time:** (local)  
-**Commit:** *(see git)*  
+**Commit:** `95129fb`  
 **What:** **`001`–`002`–`004`**: `drop policy if exists …` before `create policy` so **`npm run db:push`** succeeds when channels/policies were created manually; **SETUP-SUPABASE** troubleshooting for “policy already exists”.  
 **Cause:** User’s push failed: `policy "channels_select_anon" … already exists`.  
 **Fix / outcome:** Re-run **`db:push`** after pull.  
