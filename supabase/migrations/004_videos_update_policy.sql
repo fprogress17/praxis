@@ -1,5 +1,6 @@
--- Allow updating videos with the anon key (dev). Run in SQL Editor if saves from Edit video fail with RLS.
+-- Allow updating videos with the anon key (dev). Idempotent for `db push`.
 
+drop policy if exists "videos_update_anon" on public.videos;
 create policy "videos_update_anon"
   on public.videos
   for update

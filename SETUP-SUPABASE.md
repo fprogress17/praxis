@@ -35,6 +35,17 @@ npm run db:push
 
 **Why the assistant can’t “run SQL on your side” for your project:** your database password and account live only in Supabase. This environment has no access to your hosted Postgres unless **you** run `supabase link` (or paste SQL in the dashboard).
 
+### If `db push` failed with “policy … already exists”
+
+Migrations are **idempotent**: policies use **`DROP POLICY IF EXISTS`** before **`CREATE POLICY`**, so re-running after a manual SQL Editor apply is safe. Pull the latest `praxis-web` changes, then:
+
+```bash
+cd praxis-web
+npm run db:push
+```
+
+Answer **`Y`** (or `npm run db:push -- --yes` if your CLI supports it). If a migration still shows as stuck, see [Repair migrations](https://supabase.com/docs/reference/cli/supabase-migration-repair) or ask in Supabase Discord with the exact error.
+
 ## 2. Environment variables locally
 
 1. In the dashboard: **Project Settings** (gear) → **API** (or **Data API** / **API keys**, depending on dashboard version).

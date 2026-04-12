@@ -1,4 +1,5 @@
 -- Run in Supabase → SQL Editor after 001_channels.sql exists.
+-- Idempotent policies for safe `db push` when re-run.
 
 create table if not exists public.videos (
   id uuid primary key default gen_random_uuid(),
@@ -14,12 +15,14 @@ create index if not exists videos_created_at_idx on public.videos (created_at de
 
 alter table public.videos enable row level security;
 
+drop policy if exists "videos_select_anon" on public.videos;
 create policy "videos_select_anon"
   on public.videos
   for select
   to anon, authenticated
   using (true);
 
+drop policy if exists "videos_insert_anon" on public.videos;
 create policy "videos_insert_anon"
   on public.videos
   for insert
