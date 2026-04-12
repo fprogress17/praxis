@@ -90,7 +90,7 @@ function NextEpisodePromiseDot({ promiseText }: { promiseText: string }) {
       <button
         ref={triggerRef}
         type="button"
-        className="flex h-9 w-9 shrink-0 items-center justify-center self-center rounded-md text-accent transition-colors hover:bg-black/5 dark:hover:bg-white/10"
+        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-amber-600 transition-colors hover:bg-amber-500/15 dark:text-amber-400 dark:hover:bg-amber-400/15"
         aria-label="Next episode promise"
         aria-expanded={open}
         aria-haspopup="dialog"
@@ -101,7 +101,7 @@ function NextEpisodePromiseDot({ promiseText }: { promiseText: string }) {
         }}
       >
         <span
-          className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent shadow-[0_0_0_1px_rgba(0,0,0,0.08)] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]"
+          className="h-2 w-2 shrink-0 rounded-full bg-amber-500 shadow-[0_0_0_1px_rgba(245,158,11,0.45)] dark:bg-amber-400 dark:shadow-[0_0_0_1px_rgba(251,191,36,0.5)]"
           aria-hidden
         />
       </button>
@@ -143,36 +143,38 @@ export function ChannelVideoList({
           const promise = video.next_episode_promise?.trim() ?? "";
           return (
             <li key={video.id}>
-              <div className="flex items-stretch gap-0 rounded-lg border border-border bg-surface shadow-soft">
-                <button
-                  type="button"
-                  onClick={() => onSelectVideo(video)}
-                  className="min-w-0 flex-1 p-4 text-left transition-colors hover:bg-black/4 dark:hover:bg-white/5"
-                >
-                  <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-                    <span
-                      className={`h-2 w-2 shrink-0 rounded-full ${statusDotClass(video.status)}`}
-                      title={video.status.replace(/_/g, " ")}
-                      aria-hidden
-                    />
-                    {video.episode ? (
-                      <span className="shrink-0 rounded bg-black/6 px-1.5 py-0.5 font-mono text-label text-muted dark:bg-white/10">
-                        {video.episode}
-                      </span>
+              <button
+                type="button"
+                onClick={() => onSelectVideo(video)}
+                className="w-full rounded-lg border border-border bg-surface p-4 text-left shadow-soft transition-colors hover:bg-black/4 dark:hover:bg-white/5"
+              >
+                <div className="flex items-start gap-2">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                      <span
+                        className={`h-2 w-2 shrink-0 rounded-full ${statusDotClass(video.status)}`}
+                        title={video.status.replace(/_/g, " ")}
+                        aria-hidden
+                      />
+                      {video.episode ? (
+                        <span className="shrink-0 rounded bg-black/6 px-1.5 py-0.5 font-mono text-label text-muted dark:bg-white/10">
+                          {video.episode}
+                        </span>
+                      ) : null}
+                      <span className="min-w-0 font-medium text-foreground">{video.title}</span>
+                    </div>
+                    {video.brief ? (
+                      <p className="mt-1 line-clamp-2 text-body leading-6 text-muted">{video.brief}</p>
                     ) : null}
-                    <span className="font-medium text-foreground">{video.title}</span>
+                    <div className="mt-2 text-label text-muted">{formatDate(video.created_at)}</div>
                   </div>
-                  {video.brief ? (
-                    <p className="mt-1 line-clamp-2 text-body leading-6 text-muted">{video.brief}</p>
+                  {promise ? (
+                    <div className="shrink-0 pt-px">
+                      <NextEpisodePromiseDot promiseText={promise} />
+                    </div>
                   ) : null}
-                  <div className="mt-2 text-label text-muted">{formatDate(video.created_at)}</div>
-                </button>
-                {promise ? (
-                  <div className="flex shrink-0 border-l border-border/60 pr-1 pl-0.5">
-                    <NextEpisodePromiseDot promiseText={promise} />
-                  </div>
-                ) : null}
-              </div>
+                </div>
+              </button>
             </li>
           );
         })}
