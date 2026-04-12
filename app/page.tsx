@@ -2,6 +2,7 @@ import { createClient } from "@supabase/supabase-js";
 import { PraxisShell } from "@/components/praxis-shell";
 import type { ChannelRow } from "@/lib/types/channel";
 import type { NoteRow } from "@/lib/types/note";
+import { normalizeVideoStatus } from "@/lib/video-status";
 import type { VideoRow } from "@/lib/types/video";
 
 /** Channels come from Supabase — must not be frozen at build time. */
@@ -26,7 +27,7 @@ export default async function HomePage() {
           .order("created_at", { ascending: false }),
         supabase
           .from("videos")
-          .select("id,channel_id,episode,title,brief,script,created_at")
+          .select("id,channel_id,episode,status,title,brief,script,created_at")
           .order("created_at", { ascending: false }),
         supabase
           .from("notes")
@@ -52,6 +53,9 @@ export default async function HomePage() {
           id: String(row.id),
           channel_id: String(row.channel_id),
           episode: row.episode != null ? String(row.episode) : "",
+          status: normalizeVideoStatus(
+            row.status != null ? String(row.status) : undefined,
+          ),
           title: String(row.title),
           brief: row.brief != null ? String(row.brief) : "",
           script: row.script != null ? String(row.script) : "",

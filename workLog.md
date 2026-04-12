@@ -4,6 +4,17 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 
 ---
 
+## 2026-04-12 — Video status pulldown + compact episode/status row
+
+**Time:** (local)  
+**Commit:** (pending)  
+**What:** **`007_videos_status.sql`** (`draft` / `published` / `skip` / `to_be_published`); **`lib/video-status.ts`**; **`VideoEpisodeStatusRow`** (small **`text-label`** selects **`h-7`**, color **dot** next to status); **create/update** + list **dot**; **SETUP** 007.  
+**Cause:** User wanted status dropdown with colors and smaller episode/status controls.  
+**Fix / outcome:** Native `<option>` can’t show per-option colors; dot reflects current status.  
+**Agent:** Auto (Cursor)
+
+---
+
 ## 2026-04-12 — Video episode dropdown (ep0001–ep2000) + DB unique per channel
 
 **Time:** (local)  

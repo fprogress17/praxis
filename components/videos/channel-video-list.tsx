@@ -1,6 +1,7 @@
 "use client";
 
 import type { VideoRow } from "@/lib/types/video";
+import { statusDotClass } from "@/lib/video-status";
 
 function formatDate(iso: string) {
   try {
@@ -44,7 +45,12 @@ export function ChannelVideoList({
               onClick={() => onSelectVideo(video)}
               className="w-full rounded-lg border border-border bg-surface p-4 text-left shadow-soft transition-colors hover:bg-black/4 dark:hover:bg-white/5"
             >
-              <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                <span
+                  className={`h-2 w-2 shrink-0 rounded-full ${statusDotClass(video.status)}`}
+                  title={video.status.replace(/_/g, " ")}
+                  aria-hidden
+                />
                 {video.episode ? (
                   <span className="shrink-0 rounded bg-black/6 px-1.5 py-0.5 font-mono text-label text-muted dark:bg-white/10">
                     {video.episode}

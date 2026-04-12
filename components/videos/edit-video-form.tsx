@@ -3,7 +3,8 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { updateVideo } from "@/app/actions/videos";
-import { defaultEpisodeForNewVideo, EPISODE_SELECT_OPTIONS } from "@/lib/episode";
+import { VideoEpisodeStatusRow } from "@/components/videos/video-episode-status-row";
+import { defaultEpisodeForNewVideo } from "@/lib/episode";
 import type { VideoRow } from "@/lib/types/video";
 
 export function EditVideoForm({
@@ -64,26 +65,12 @@ export function EditVideoForm({
         </p>
 
         <div className="space-y-5">
-          <div>
-            <label
-              htmlFor="edit-video-episode"
-              className="mb-1.5 block text-label font-medium text-foreground"
-            >
-              Episode
-            </label>
-            <select
-              id="edit-video-episode"
-              name="episode"
-              defaultValue={defaultEpisode}
-              className="w-full max-w-xs rounded-md border border-border bg-paper px-3 py-2 text-ui text-foreground shadow-sm outline-none ring-accent/30 focus:ring-2 dark:bg-paper-light/30"
-            >
-              {EPISODE_SELECT_OPTIONS.map((ep) => (
-                <option key={ep} value={ep}>
-                  {ep}
-                </option>
-              ))}
-            </select>
-          </div>
+          <VideoEpisodeStatusRow
+            episodeDefault={defaultEpisode}
+            statusDefault={video.status}
+            episodeHtmlId="edit-video-episode"
+            statusHtmlId="edit-video-status"
+          />
 
           <div>
             <label
