@@ -7,7 +7,7 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 ## 2026-04-22 — Cut runtime over to local Postgres and local file storage
 
 **Time:** 16:19 EDT  
-**Commit:** (pending)  
+**Commit:** `f1e4e63`  
 **What:** Replaced the app runtime’s Supabase table access with a shared Postgres layer, added a local file storage layer plus `/api/files/[id]` serving, moved file upload/delete/edit flows to server actions backed by local disk, added plain-Postgres schema/apply/export helpers, and verified `npm run typecheck`, `npm run lint`, and `npm run build`.  
 **Cause:** User requested a safety-first full migration from Supabase to local Postgres using the provided local database URL.  
 **Fix / outcome:** Praxis now runs against local Postgres via `DATABASE_URL` and serves file content from local storage instead of Supabase Storage, with the migrated data already loaded into the local `praxis` database.  
