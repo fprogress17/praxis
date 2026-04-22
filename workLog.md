@@ -7,7 +7,7 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 ## 2026-04-22 — Update docs for local runtime and verify dev boot
 
 **Time:** 16:22 EDT  
-**Commit:** (pending)  
+**Commit:** `4cbbc83`  
 **What:** Updated README, STACK, PRODUCT_IDENTITY, and SETUP-SUPABASE so they reflect the new local-Postgres/local-file-storage runtime while preserving Supabase docs as migration-source references. Started `npm run dev` and confirmed the app responded `HTTP/1.1 200 OK` on `http://localhost:3000`.  
 **Cause:** After the runtime cutover, the main remaining mismatch was documentation still describing Supabase as the active backend.  
 **Fix / outcome:** Repo guidance now matches the current architecture and the live local runtime was verified end-to-end.  
