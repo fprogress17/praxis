@@ -1,5 +1,18 @@
 # Supabase setup for Praxis web
 
+This file is now **legacy / migration-source documentation**. The active runtime has been cut over to local Postgres.
+
+If you are setting up the current app locally, start with:
+
+- [`LOCAL_POSTGRES_MIGRATION.md`](./LOCAL_POSTGRES_MIGRATION.md)
+- `DATABASE_URL` in `.env.local`
+
+Keep this file for:
+
+- exporting from an older Supabase project
+- re-running historical hosted migrations
+- checking the old schema/RLS/storage assumptions
+
 After you **sign up** and create a **project**, you only need a few steps. **Do not paste keys into chat.**
 
 ## 1. Create the table and policies
@@ -15,10 +28,22 @@ After you **sign up** and create a **project**, you only need a few steps. **Do 
    - **`supabase/migrations/006_videos_episode.sql`** — **Episode** dropdown (`ep0001`…); unique per channel when non-empty
    - **`supabase/migrations/007_videos_status.sql`** — **Status** (`draft`, `published`, `skip`, `to_be_published`)
    - **`supabase/migrations/008_videos_next_episode_promise.sql`** — **Next episode promise** text field
+   - **`supabase/migrations/009_ideas.sql`** — **Ideas** (quick-capture notes per channel; **Idea** button + list under videos)
+   - **`supabase/migrations/010_ideas_update_delete.sql`** — **Edit / delete** ideas (UPDATE + DELETE + RLS); run if save or delete fails with a permission error
+   - **`supabase/migrations/011_workspace_ideas.sql`** — **Channel ideas** (not tied to a channel yet; **Idea** next to **New channel** + list under channels)
+   - **`supabase/migrations/012_notes_video_id.sql`** — **Notes** can be channel-wide or per-**video** (right panel follows channel list vs edit video)
+   - **`supabase/migrations/013_notes_delete.sql`** — **Delete** notes (RLS + grant); run if trash/delete fails with a permission error
+   - **`supabase/migrations/014_videos_tts_script.sql`** — **TTS Script** field on videos (between Script and Next episode promise in the UI)
+   - **`supabase/migrations/015_workspace_notes.sql`** — **Workspace notes** (right panel on **Home** / no channel selected — above per-channel notes)
+   - **`supabase/migrations/016_files.sql`** — **Files** tab metadata + private **`praxis-files`** Supabase Storage bucket for workspace/channel/video uploads
+   - **`supabase/migrations/017_links.sql`** — **Links** tab for workspace/channel/video URLs, source notes, competitor videos, and references
+   - **`supabase/migrations/018_videos_delete_policy.sql`** — **Delete** videos from channel episode lists (RLS + grant)
 
 **Important:** The SQL editor runs **SQL text only**. If you paste a **file path** instead of the file **contents**, you will get a **syntax error**.
 
 That creates tables and **Row Level Security** policies so the **anon** / **publishable** client key can **select** and **insert** (fine for solo dev; tighten before any public launch).
+
+The **Files** tab uses Supabase Storage for the actual file bytes and `public.files` for scope metadata. For this solo-dev phase, the bucket is private but readable/writable through permissive RLS policies for the configured anon/publishable key. Tighten this before public use.
 
 ### Optional — Supabase CLI (installed in this repo)
 
@@ -49,6 +74,26 @@ npm run db:push
 ```
 
 Answer **`Y`** (or `npm run db:push -- --yes` if your CLI supports it). If a migration still shows as stuck, see [Repair migrations](https://supabase.com/docs/reference/cli/supabase-migration-repair) or ask in Supabase Discord with the exact error.
+
+### If `db push` failed with “unexpected login role status 403”
+
+This is a Supabase account / project access issue, not a Praxis code issue. The CLI could not initialise the temporary login role through Supabase’s management endpoint.
+
+Fastest unblock:
+
+1. Open **Supabase Dashboard → SQL Editor → New query**.
+2. Copy the full contents of the migration you need, for example **`supabase/migrations/016_files.sql`**.
+3. Paste the SQL text into the editor and run it.
+
+CLI alternative:
+
+```bash
+cd praxis-web
+export SUPABASE_DB_PASSWORD='your-project-database-password'
+npm run db:push
+```
+
+Do **not** paste the database password into chat. If you do not have the password, reset it in Supabase project settings and store it in your password manager. If this project belongs to another Supabase organization, confirm your account has enough project database permissions.
 
 ## 2. Environment variables locally
 

@@ -1,6 +1,6 @@
 # Praxis — Stack (living)
 
-*Last updated: 2026-04-12*
+*Last updated: 2026-04-22*
 
 Goal: **speed and low friction**. Stack can change when something else is faster — this file is the **current default**, not a religion. Product identity: **[PRODUCT_IDENTITY.md](./PRODUCT_IDENTITY.md)** (YouTube channel creation workspace).
 
@@ -10,51 +10,65 @@ Goal: **speed and low friction**. Stack can change when something else is faster
 
 | Layer | Choice | Notes |
 |--------|--------|--------|
-| **App** | **Next.js** (App Router) | Fast path with Vercel; Supabase docs and examples align well. Swap later if needed. |
+| **App** | **Next.js** (App Router) | Fast local iteration, straightforward server actions, easy API routes for local file serving. |
 | **UI** | **React**, **Tailwind CSS** | Match Marginalia-style tokens (light-first, later light/dark/system) when implementing. |
-| **Backend** | **Supabase** | Postgres + Auth + RLS + dashboard + JS/Swift SDKs; minimal glue for multi-device. |
+| **Backend** | **Local Postgres** | Current runtime uses `pg` via a shared server data layer and `DATABASE_URL`. |
+| **File storage** | **Local disk** | Current default is `local-storage/praxis-files` or `FILE_STORAGE_ROOT` if set. |
 | **Rich text** | **Lexical** | See [EDITOR.md](./EDITOR.md). |
-| **Hosting (typical)** | **Vercel** (Next) | Same account flow many tutorials assume; not mandatory forever. |
+| **Hosting (typical)** | **Local-first** | Current setup is local runtime and local database; hosting can be revisited later. |
 
 ---
 
-## Supabase — what you do locally
+## Local runtime
 
-1. **Sign up** at [supabase.com](https://supabase.com) and create a **project** (pick region, set a DB password — store it safely).
-2. In the dashboard: **Project Settings → API**:
-   - **Project URL** — public base URL for the API.
-   - **`anon` `public` key** — safe to use in **browser** code **only** together with **Row Level Security (RLS)** policies you define. Still treat it as “public” and don’t email it randomly; you normally do **not** paste it into chat with strangers.
-   - **`service_role` key** — **server-only**, bypasses RLS. **Never** put it in frontend code, **never** commit it, **never** paste it into AI chat.
+1. Create or reuse a local Postgres database.
+2. In `.env.local`, set:
 
-3. In your app repo (when scaffolded), use **environment variables** — e.g. for Next:
+   - `DATABASE_URL`
+   - optional `FILE_STORAGE_ROOT`
 
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+3. Apply the local schema:
 
-   Put real values in **`.env.local`** (gitignored). Commit only **`.env.example`** with empty placeholders.
+```bash
+cd praxis-web
+npm run db:local:apply
+```
+
+4. Start the app:
+
+```bash
+npm run dev
+```
+
+The default file storage root is `local-storage/praxis-files`.
 
 ---
 
-## Do you need to give the AI your API keys?
+## Migration source
 
-**No.** For security and habit:
+Supabase is no longer the runtime backend, but the repo still includes:
 
-- **Do not** paste **any** Supabase secret (`service_role`) or your **database password** into Cursor or any chat.
-- **Avoid** pasting even the **`anon`** key unless there is a rare debugging need; instead, describe errors or use redacted placeholders.
+- `supabase/migrations/`
+- `SETUP-SUPABASE.md`
+- export/download scripts that read from a configured Supabase project
 
-If something breaks, share **error messages**, **RLS policy SQL** (no secrets), and **which env var names** you set — not the key values.
+Those exist to support staged migration and backup/import workflows, not the active runtime path.
 
 ---
 
 ## Changing the stack later
 
-Document swaps here (e.g. move auth to Clerk, DB to Neon) when/if speed or constraints change. **Migrations** and **export** from Supabase remain possible because the data model stays **relational** under the hood.
+Document swaps here when/if speed or deployment constraints change. Current obvious future options:
+
+- hosted Postgres instead of local Postgres
+- S3-compatible object storage instead of local disk
+- auth layer if the app stops being single-user/local-first
 
 ---
 
-## First-time Supabase
+## First-time local setup
 
-See **[SETUP-SUPABASE.md](./SETUP-SUPABASE.md)** and run **`supabase/migrations/001_channels.sql`** in the SQL Editor.
+See **[LOCAL_POSTGRES_MIGRATION.md](./LOCAL_POSTGRES_MIGRATION.md)**.
 
 ---
 

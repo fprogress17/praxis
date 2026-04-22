@@ -8,7 +8,7 @@ This document is the **source of truth** for what **Praxis** means in the **`pra
 
 ## 1. What Praxis is **now** (active focus)
 
-**Praxis is a YouTube channel creation workspace** — a desktop-first web app for organizing work **by channel**, drafting **videos** (title, brief, script), capturing **notes** beside the workflow, and (soon) using an **AI** tab for creator-focused help — all backed by **Supabase** so one person can use it from multiple machines.
+**Praxis is a YouTube channel creation workspace** — a desktop-first web app for organizing work **by channel**, drafting **videos** (title, brief, script), capturing **notes** beside the workflow, and (soon) using an **AI** tab for creator-focused help — currently backed by **local Postgres** and local file storage for safety-first local development.
 
 - **Channels** = YouTube-style workspaces (your show, series, or brand — each with its own videos and notes).
 - **Videos** = planned or in-progress pieces (metadata + script area), not “memory entries” in the abstract.
@@ -73,7 +73,7 @@ These replace earlier generic “project memory” examples. Implementation is s
 
 **Context to pass into prompts (when you build the feature):** active channel name, category, channel brief, selected video fields, optional note excerpts — so answers stay scoped like a **room assistant**, not a generic chatbot.
 
-**History:** Same as before technically — you store turns (state, `localStorage`, or Supabase) and send recent messages with each request; **“new chat”** clears your stored thread.
+**History:** Same as before technically — you store turns (state, `localStorage`, or another persistence layer) and send recent messages with each request; **“new chat”** clears your stored thread.
 
 ---
 
@@ -90,7 +90,7 @@ These replace earlier generic “project memory” examples. Implementation is s
 | File | Role |
 |------|------|
 | [REQUIREMENTS_AND_DECISIONS.md](./REQUIREMENTS_AND_DECISIONS.md) | Priorities, constraints, delivery strategy. |
-| [STACK.md](./STACK.md) | Next.js, Supabase, env safety. |
+| [STACK.md](./STACK.md) | Next.js, local Postgres, env safety. |
 | [SETUP-SUPABASE.md](./SETUP-SUPABASE.md) | DB setup. |
 | [workLog.md](./workLog.md) | Dated changes. |
 
