@@ -43,7 +43,7 @@ export function PraxisShell({
   initialIdeas,
   initialWorkspaceIdeas,
   initialWorkspaceNotes,
-  supabaseConfigured,
+  dataConfigured,
 }: {
   initialChannels: ChannelRow[];
   initialVideos: VideoRow[];
@@ -53,7 +53,7 @@ export function PraxisShell({
   initialIdeas: IdeaRow[];
   initialWorkspaceIdeas: WorkspaceIdeaRow[];
   initialWorkspaceNotes: WorkspaceNoteRow[];
-  supabaseConfigured: boolean;
+  dataConfigured: boolean;
 }) {
   const [mode, setMode] = useState<Mode>("home");
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -405,7 +405,7 @@ export function PraxisShell({
           onSelectChannel={selectChannel}
           onAddVideo={openAddVideo}
           onAddIdea={openAddIdea}
-          supabaseConfigured={supabaseConfigured}
+          dataConfigured={dataConfigured}
         />
       )}
 
@@ -422,7 +422,7 @@ export function PraxisShell({
             onAddVideo={openAddVideo}
             onAddIdea={openAddIdea}
             onReorderChannels={handleReorderChannels}
-            supabaseConfigured={supabaseConfigured}
+            dataConfigured={dataConfigured}
           />
         ) : (
           <ChannelsPanelRail onOpen={() => setChannelsPanelOpen(true)} />
@@ -433,7 +433,7 @@ export function PraxisShell({
           className="flex min-h-0 min-w-0 flex-1 flex-col lg:flex-row"
         >
           <CenterPanel>
-            {!supabaseConfigured ? (
+            {!dataConfigured ? (
               <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-body text-amber-950 dark:border-amber-900/40 dark:bg-amber-950/30 dark:text-amber-100">
                 <p className="font-medium">Local database config missing</p>
                 <p className="mt-2 text-meta leading-6 opacity-90">
@@ -465,7 +465,7 @@ export function PraxisShell({
             channelNotes={rightPanelNotes}
             files={rightPanelFiles}
             links={rightPanelLinks}
-            supabaseConfigured={supabaseConfigured}
+            dataConfigured={dataConfigured}
             widthPx={rightPanelWidthPx}
           />
         </div>

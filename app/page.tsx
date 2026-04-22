@@ -175,7 +175,7 @@ export default async function HomePage() {
       initialIdeas={ideas}
       initialWorkspaceIdeas={workspaceIdeas}
       initialWorkspaceNotes={workspaceNotes}
-      supabaseConfigured={dataConfigured}
+      dataConfigured={dataConfigured}
     />
   );
 }

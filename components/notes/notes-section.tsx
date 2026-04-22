@@ -16,14 +16,14 @@ export type NotesSectionProps =
   | {
       scope: "workspace";
       notes: WorkspaceNoteRow[];
-      supabaseConfigured: boolean;
+      dataConfigured: boolean;
     }
   | {
       scope: "channel" | "video";
       channelId: string;
       videoId: string | null;
       notes: NoteRow[];
-      supabaseConfigured: boolean;
+      dataConfigured: boolean;
     };
 
 export function NotesSection(props: NotesSectionProps) {
@@ -49,7 +49,7 @@ export function NotesSection(props: NotesSectionProps) {
     setError(null);
   }, [panelKey]);
 
-  if (!props.supabaseConfigured) {
+  if (!props.dataConfigured) {
     return (
       <p className="text-meta leading-6 text-muted">
         Configure <code className="rounded bg-black/5 px-1 dark:bg-white/10">DATABASE_URL</code> in{" "}

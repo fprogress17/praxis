@@ -18,7 +18,7 @@ export function MobileNav({
   onSelectChannel,
   onAddVideo,
   onAddIdea,
-  supabaseConfigured,
+  dataConfigured,
 }: {
   channels: ChannelRow[];
   onNewChannel: () => void;
@@ -29,7 +29,7 @@ export function MobileNav({
   onSelectChannel: (id: string) => void;
   onAddVideo: (channelId: string) => void;
   onAddIdea: (channelId: string) => void;
-  supabaseConfigured: boolean;
+  dataConfigured: boolean;
 }) {
   return (
     <header className="sticky top-0 z-20 shrink-0 border-b border-border bg-paper lg:hidden">
@@ -56,8 +56,8 @@ export function MobileNav({
             <button
               type="button"
               onClick={onWorkspaceIdea}
-              disabled={!supabaseConfigured}
-              title={!supabaseConfigured ? "Configure DATABASE_URL first" : undefined}
+              disabled={!dataConfigured}
+              title={!dataConfigured ? "Configure DATABASE_URL first" : undefined}
               className="flex items-center justify-center gap-1 rounded-lg border border-border bg-surface px-2 py-2 text-label font-medium text-foreground shadow-soft disabled:cursor-not-allowed disabled:opacity-50"
             >
               <Lightbulb className="h-3.5 w-3.5 shrink-0 opacity-90 sm:h-4 sm:w-4" strokeWidth={1.75} aria-hidden />
@@ -93,7 +93,7 @@ export function MobileNav({
               ))}
             </div>
           )}
-          {supabaseConfigured ? (
+          {dataConfigured ? (
             <div className="border-t border-border">
               <WorkspaceIdeaSidebarList ideas={workspaceIdeas} embedded />
             </div>

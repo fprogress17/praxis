@@ -35,7 +35,7 @@ export function Sidebar({
   onAddVideo,
   onAddIdea,
   onReorderChannels,
-  supabaseConfigured,
+  dataConfigured,
 }: {
   channels: ChannelRow[];
   onNewChannel: () => void;
@@ -47,7 +47,7 @@ export function Sidebar({
   onAddVideo: (channelId: string) => void;
   onAddIdea: (channelId: string) => void;
   onReorderChannels: (newIds: string[]) => void;
-  supabaseConfigured: boolean;
+  dataConfigured: boolean;
 }) {
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -88,8 +88,8 @@ export function Sidebar({
           <button
             type="button"
             onClick={onWorkspaceIdea}
-            disabled={!supabaseConfigured}
-            title={!supabaseConfigured ? "Configure DATABASE_URL in .env.local first" : undefined}
+            disabled={!dataConfigured}
+            title={!dataConfigured ? "Configure DATABASE_URL in .env.local first" : undefined}
             className="flex items-center justify-center gap-1.5 rounded-lg border border-border bg-surface px-2 py-2.5 text-label font-medium text-foreground shadow-soft transition-colors hover:bg-black/4 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-white/5"
           >
             <Lightbulb className="h-4 w-4 shrink-0 opacity-90" strokeWidth={1.75} aria-hidden />
@@ -131,7 +131,7 @@ export function Sidebar({
             </SortableContext>
           </DndContext>
         )}
-        {supabaseConfigured ? <WorkspaceIdeaSidebarList ideas={workspaceIdeas} /> : null}
+        {dataConfigured ? <WorkspaceIdeaSidebarList ideas={workspaceIdeas} /> : null}
       </div>
 
       <div className="border-t border-border p-4">

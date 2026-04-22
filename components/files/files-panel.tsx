@@ -26,7 +26,7 @@ type FilesPanelProps = {
   channelId: string | null;
   videoId: string | null;
   files: FileRow[];
-  supabaseConfigured: boolean;
+  dataConfigured: boolean;
   contextTitle: string;
   contextDetail: string;
   contextLabel: string;
@@ -159,7 +159,7 @@ export function FilesPanel({
   channelId,
   videoId,
   files,
-  supabaseConfigured,
+  dataConfigured,
   contextTitle,
   contextDetail,
   contextLabel,
@@ -386,7 +386,7 @@ export function FilesPanel({
     };
   }, [verticalDragging]);
 
-  if (!supabaseConfigured) {
+  if (!dataConfigured) {
     return (
       <p className="text-meta leading-6 text-muted">
         Configure <code className="rounded bg-black/5 px-1 dark:bg-white/10">DATABASE_URL</code> in{" "}

@@ -11,7 +11,7 @@ type LinksSectionProps = {
   channelId: string | null;
   videoId: string | null;
   links: LinkRow[];
-  supabaseConfigured: boolean;
+  dataConfigured: boolean;
 };
 
 function displayTitle(link: LinkRow) {
@@ -40,7 +40,7 @@ export function LinksSection({
   channelId,
   videoId,
   links,
-  supabaseConfigured,
+  dataConfigured,
 }: LinksSectionProps) {
   const router = useRouter();
   const panelKey = `${scope}:${channelId ?? ""}:${videoId ?? ""}`;
@@ -60,7 +60,7 @@ export function LinksSection({
     setError(null);
   }, [panelKey]);
 
-  if (!supabaseConfigured) {
+  if (!dataConfigured) {
     return (
       <p className="text-meta leading-6 text-muted">
         Configure <code className="rounded bg-black/5 px-1 dark:bg-white/10">DATABASE_URL</code> in{" "}
