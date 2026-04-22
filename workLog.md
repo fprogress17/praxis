@@ -4,6 +4,17 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 
 ---
 
+## 2026-04-22 — Commit active browser, ideas, and type files
+
+**Time:** 16:35 EDT  
+**Commit:** (pending)  
+**What:** Added the currently used browser-panel component, idea components, and supporting row/type files to source control, together with the tracked channel/video/type updates they depend on. Re-ran `npm run typecheck`, `npm run lint`, and `npm run smoke:local`.  
+**Cause:** The runtime was already importing these files from the working tree, but they were still outside committed history, which meant the checked-in repo did not fully match the app actually being run.  
+**Fix / outcome:** The active app surface is now being brought into git as a coherent checkpoint instead of relying on local-only files.  
+**Agent:** Codex
+
+---
+
 ## 2026-04-22 — Rename runtime config flag away from Supabase wording
 
 **Time:** 16:33 EDT  

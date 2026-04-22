@@ -32,6 +32,14 @@ export function NewVideoForm({
     setError(null);
     const form = e.currentTarget;
     const fd = new FormData(form);
+    const submittedChannelId = String(fd.get("channel_id") ?? "");
+
+    if (submittedChannelId !== channelId) {
+      setError(
+        "Channel changed while this form was open. Cancel and use Add video from the target channel again.",
+      );
+      return;
+    }
 
     setPending(true);
     try {
@@ -54,13 +62,13 @@ export function NewVideoForm({
         New video
       </div>
       <form
-        key={channelId}
         onSubmit={onSubmit}
         className="rounded-lg border border-border bg-surface p-6 shadow-soft"
       >
         <input type="hidden" name="channel_id" value={channelId} />
         <p className="mb-5 text-meta text-muted">
           Channel: <span className="font-medium text-foreground">{channelTitle}</span>
+          <span className="ml-2 font-mono text-label text-muted">{channelId.slice(0, 8)}</span>
         </p>
 
         <div className="space-y-5">
@@ -115,6 +123,22 @@ export function NewVideoForm({
               name="script"
               rows={12}
               placeholder="Outline, full script, or rough notes…"
+              className="w-full resize-y rounded-md border border-border bg-paper px-3 py-2 font-serif text-body leading-7 text-foreground shadow-sm outline-none ring-accent/30 placeholder:text-muted focus:ring-2 dark:bg-paper-light/30"
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="video-tts-script"
+              className="mb-1.5 block text-label font-medium text-foreground"
+            >
+              TTS Script
+            </label>
+            <textarea
+              id="video-tts-script"
+              name="tts_script"
+              rows={12}
+              placeholder="Narration or voice-over text optimized for TTS…"
               className="w-full resize-y rounded-md border border-border bg-paper px-3 py-2 font-serif text-body leading-7 text-foreground shadow-sm outline-none ring-accent/30 placeholder:text-muted focus:ring-2 dark:bg-paper-light/30"
             />
           </div>
