@@ -7,7 +7,7 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 ## 2026-04-22 — Rename runtime config flag away from Supabase wording
 
 **Time:** 16:33 EDT  
-**Commit:** (pending)  
+**Commit:** `8ebf181`  
 **What:** Renamed the active app-path prop and gating semantics from `supabaseConfigured` to `dataConfigured` across page load, shell layout, right panel, notes, links, files, and navigation/sidebar components. Re-ran `npm run typecheck`, `npm run lint`, and `npm run smoke:local`.  
 **Cause:** The runtime had already been cut over to local Postgres, but the live component API still carried stale Supabase naming, which made the architecture harder to reason about.  
 **Fix / outcome:** The active code path now reflects the current backend model more accurately without changing behavior.  
