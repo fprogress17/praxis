@@ -7,7 +7,7 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 ## 2026-04-22 — Add standalone local runtime smoke check
 
 **Time:** 16:26 EDT  
-**Commit:** (pending)  
+**Commit:** `1e8a102`  
 **What:** Added `scripts/smoke-local-runtime.mjs` and `npm run smoke:local` to validate `DATABASE_URL`, required public tables, row counts, and local file storage root outside the Next.js runtime. Also moved tooling-only `@supabase/supabase-js` and `@types/pg` intent into non-runtime usage and refreshed the lockfile.  
 **Cause:** After the cutover and doc cleanup, there was still no one-command verification for the local runtime itself, and the first smoke pass failed because `.env.local` was not being loaded in the standalone script.  
 **Fix / outcome:** `npm run smoke:local` now passes against the local `praxis` database and gives a quick health check for the migrated runtime.  
