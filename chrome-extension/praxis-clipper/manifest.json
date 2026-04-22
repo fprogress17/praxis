@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "Praxis Clipper",
+  "description": "Capture current tab context and clip it into Praxis workflows.",
+  "version": "0.1.0",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Praxis Clipper"
+  },
+  "permissions": ["tabs", "storage"],
+  "host_permissions": ["http://localhost:3000/*", "https://*/*"]
+}

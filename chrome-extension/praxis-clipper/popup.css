@@ -1,0 +1,132 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  background: #f7f7f8;
+  color: #101113;
+}
+
+.panel {
+  width: 360px;
+  max-height: 640px;
+  overflow: auto;
+  padding: 12px;
+}
+
+h1 {
+  margin: 0 0 10px;
+  font-size: 16px;
+}
+
+h2 {
+  margin: 0;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #555b63;
+}
+
+.field {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.field > span {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 12px;
+  color: #4e535a;
+}
+
+input,
+textarea,
+select,
+button {
+  font: inherit;
+}
+
+input,
+textarea,
+select {
+  width: 100%;
+  border: 1px solid #d5d7dc;
+  border-radius: 8px;
+  padding: 7px 9px;
+  background: #fff;
+}
+
+textarea {
+  resize: vertical;
+}
+
+.actions {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+}
+
+button {
+  border: 1px solid #d5d7dc;
+  border-radius: 8px;
+  background: #fff;
+  padding: 7px 8px;
+  cursor: pointer;
+}
+
+button.primary {
+  background: #101113;
+  border-color: #101113;
+  color: #fff;
+}
+
+.status {
+  min-height: 18px;
+  margin: 8px 1px 4px;
+  font-size: 12px;
+  color: #4e535a;
+}
+
+.history {
+  margin-top: 8px;
+  border-top: 1px solid #e3e5e8;
+  padding-top: 8px;
+}
+
+.history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+#historyList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 6px;
+}
+
+#historyList li {
+  border: 1px solid #d5d7dc;
+  border-radius: 8px;
+  background: #fff;
+  padding: 6px 8px;
+}
+
+.meta {
+  color: #636a73;
+  font-size: 11px;
+}
+
+.title {
+  margin-top: 2px;
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

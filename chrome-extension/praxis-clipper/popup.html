@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Praxis Clipper</title>
+    <link rel="stylesheet" href="./popup.css" />
+  </head>
+  <body>
+    <main class="panel">
+      <h1>Praxis Clipper</h1>
+
+      <label class="field">
+        <span>Praxis URL</span>
+        <input id="praxisUrl" type="text" placeholder="http://localhost:3000" />
+      </label>
+
+      <label class="field">
+        <span>Scope</span>
+        <select id="scope">
+          <option value="workspace">Workspace</option>
+          <option value="channel">Channel</option>
+          <option value="video">Video</option>
+        </select>
+      </label>
+
+      <label class="field">
+        <span>Channel ID (optional)</span>
+        <input id="channelId" type="text" placeholder="uuid" />
+      </label>
+
+      <label class="field">
+        <span>Video ID (optional)</span>
+        <input id="videoId" type="text" placeholder="uuid" />
+      </label>
+
+      <label class="field">
+        <span>Quick note</span>
+        <textarea id="note" rows="4" placeholder="Hook, angle, insight..."></textarea>
+      </label>
+
+      <div class="actions">
+        <button id="copyJson" type="button">Copy JSON</button>
+        <button id="openPraxis" type="button">Open Praxis</button>
+        <button id="saveClip" type="button" class="primary">Save Clip</button>
+      </div>
+
+      <p id="status" class="status" aria-live="polite"></p>
+
+      <section class="history">
+        <div class="history-header">
+          <h2>Recent clips</h2>
+          <button id="clearHistory" type="button">Clear</button>
+        </div>
+        <ul id="historyList"></ul>
+      </section>
+    </main>
+
+    <script src="./popup.js"></script>
+  </body>
+</html>
