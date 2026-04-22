@@ -6,6 +6,7 @@ node_modules
 # next
 .next
 out
+tsconfig.tsbuildinfo
 
 # env
 .env
@@ -27,3 +28,6 @@ yarn-error.log*
 
 # supabase cli (after `supabase link`)
 .supabase
+
+# local migration artifacts
+local-storage

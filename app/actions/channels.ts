@@ -1,8 +1,8 @@
 "use server";
 
-import { createClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
 import { CHANNEL_CATEGORIES } from "@/lib/channel-categories";
+import { query } from "@/lib/server/db";
 
 export type CreateChannelResult =
   | { ok: true }
@@ -21,33 +21,27 @@ export async function createChannel(formData: FormData): Promise<CreateChannelRe
     return { ok: false, error: "Pick a valid category." };
   }
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!url || !key) {
+  try {
+    await query(
+      `insert into public.channels (title, category, brief_note)
+       values ($1, $2, $3)`,
+      [title, category, brief_note || null],
+    );
+  } catch (error) {
     return {
       ok: false,
-      error: "Supabase is not configured. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to .env.local.",
-    };
-  }
-
-  const supabase = createClient(url, key);
-
-  const { error } = await supabase.from("channels").insert({
-    title,
-    category,
-    brief_note: brief_note || null,
-  });
-
-  if (error) {
-    return {
-      ok: false,
-      error: error.message.includes("row-level security")
-        ? "Database rejected the write. Run the SQL in supabase/migrations/001_channels.sql (see SETUP-SUPABASE.md)."
-        : error.message,
+      error: error instanceof Error ? error.message : "Could not create channel.",
     };
   }
 
   revalidatePath("/");
   return { ok: true };
+}
+
+export async function updateChannelPositions(orderedIds: string[]): Promise<void> {
+  await Promise.all(
+    orderedIds.map((id, index) =>
+      query(`update public.channels set position = $2 where id = $1`, [id, index + 1]),
+    ),
+  );
 }

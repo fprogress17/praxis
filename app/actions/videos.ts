@@ -1,24 +1,18 @@
 "use server";
 
-import { createClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
+import { query } from "@/lib/server/db";
 import { normalizeVideoStatus } from "@/lib/video-status";
 
-const VIDEOS_TABLE_HINT =
-  "The videos table is missing. In Supabase → SQL Editor, paste and run the full contents of praxis-web/supabase/migrations/002_videos.sql (then 003 only if your 002 had no brief column; 004 for editing). See SETUP-SUPABASE.md. If the table already exists, wait a minute or in Dashboard use Table Editor → refresh / restart the project so the API schema cache updates.";
-
-function videosErrorMessage(error: { message: string; code?: string }): string | null {
-  const msg = error.message.toLowerCase();
-  if (
-    error.code === "PGRST205" ||
-    msg.includes("schema cache") ||
-    msg.includes("could not find the table") ||
-    msg.includes("relation \"videos\"") ||
-    msg.includes("does not exist")
-  ) {
-    return VIDEOS_TABLE_HINT;
-  }
-  return null;
+function isUniqueError(error: unknown, constraint: string) {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    (error as { code?: string }).code === "23505" &&
+    "constraint" in error &&
+    (error as { constraint?: string }).constraint === constraint
+  );
 }
 
 export type CreateVideoResult =
@@ -32,6 +26,7 @@ export async function createVideo(formData: FormData): Promise<CreateVideoResult
   const title = String(formData.get("title") ?? "").trim();
   const brief = String(formData.get("brief") ?? "").trim();
   const script = String(formData.get("script") ?? "").trim();
+  const tts_script = String(formData.get("tts_script") ?? "").trim();
   const next_episode_promise = String(formData.get("next_episode_promise") ?? "").trim();
 
   if (!channel_id) {
@@ -41,53 +36,30 @@ export async function createVideo(formData: FormData): Promise<CreateVideoResult
     return { ok: false, error: "Video title is required." };
   }
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!url || !key) {
-    return {
-      ok: false,
-      error: "Supabase is not configured. Check .env.local.",
-    };
-  }
-
-  const supabase = createClient(url, key);
-
-  const { error } = await supabase.from("videos").insert({
-    channel_id,
-    episode: episode || "",
-    status,
-    title,
-    brief: brief || "",
-    script: script || "",
-    next_episode_promise: next_episode_promise || "",
-  });
-
-  if (error) {
-    const tableHint = videosErrorMessage(error);
-    const dup =
-      error.code === "23505" ||
-      error.message.toLowerCase().includes("duplicate") ||
-      error.message.includes("videos_channel_episode_unique");
-    const hint =
-      tableHint ??
-      (dup
-        ? "That episode code is already used for this channel. Choose another from the list."
-        : error.message.includes("next_episode_promise") || error.code === "PGRST204"
-          ? "Run supabase/migrations/008_videos_next_episode_promise.sql (or npm run db:push -- --yes). See SETUP-SUPABASE.md."
-          : error.message.includes("status") || error.code === "PGRST204"
-            ? "Run supabase/migrations/007_videos_status.sql (or npm run db:push -- --yes). See SETUP-SUPABASE.md."
-            : error.message.includes("episode") || error.code === "PGRST204"
-              ? "Run supabase/migrations/006_videos_episode.sql (or npm run db:push -- --yes). See SETUP-SUPABASE.md."
-              : error.message.includes("brief") || error.code === "PGRST204"
-                ? "Run supabase/migrations/003_videos_brief.sql (and 002 if needed). See SETUP-SUPABASE.md."
-                : error.message.includes("row-level security") || error.code === "42P01"
-                  ? "Run supabase/migrations/002_videos.sql (see SETUP-SUPABASE.md)."
-                  : null);
-    return {
-      ok: false,
-      error: hint ?? error.message,
-    };
+  try {
+    await query(
+      `insert into public.videos (
+        channel_id, episode, status, title, brief, script, tts_script, next_episode_promise
+      ) values ($1, $2, $3, $4, $5, $6, $7, $8)`,
+      [
+        channel_id,
+        episode || "",
+        status,
+        title,
+        brief || "",
+        script || "",
+        tts_script || "",
+        next_episode_promise || "",
+      ],
+    );
+  } catch (error) {
+    if (isUniqueError(error, "videos_channel_episode_unique")) {
+      return {
+        ok: false,
+        error: "That episode code is already used for this channel. Choose another from the list.",
+      };
+    }
+    return { ok: false, error: error instanceof Error ? error.message : "Could not create video." };
   }
 
   revalidatePath("/");
@@ -101,6 +73,7 @@ export async function updateVideo(formData: FormData): Promise<CreateVideoResult
   const title = String(formData.get("title") ?? "").trim();
   const brief = String(formData.get("brief") ?? "").trim();
   const script = String(formData.get("script") ?? "").trim();
+  const tts_script = String(formData.get("tts_script") ?? "").trim();
   const next_episode_promise = String(formData.get("next_episode_promise") ?? "").trim();
 
   if (!id) {
@@ -110,53 +83,43 @@ export async function updateVideo(formData: FormData): Promise<CreateVideoResult
     return { ok: false, error: "Video title is required." };
   }
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!url || !key) {
-    return {
-      ok: false,
-      error: "Supabase is not configured. Check .env.local.",
-    };
+  try {
+    await query(
+      `update public.videos
+       set episode = $2,
+           status = $3,
+           title = $4,
+           brief = $5,
+           script = $6,
+           tts_script = $7,
+           next_episode_promise = $8
+       where id = $1`,
+      [id, episode || "", status, title, brief || "", script || "", tts_script || "", next_episode_promise || ""],
+    );
+  } catch (error) {
+    if (isUniqueError(error, "videos_channel_episode_unique")) {
+      return {
+        ok: false,
+        error: "That episode code is already used for this channel. Choose another from the list.",
+      };
+    }
+    return { ok: false, error: error instanceof Error ? error.message : "Could not update video." };
   }
 
-  const supabase = createClient(url, key);
+  revalidatePath("/");
+  return { ok: true };
+}
 
-  const { error } = await supabase
-    .from("videos")
-    .update({
-      episode: episode || "",
-      status,
-      title,
-      brief: brief || "",
-      script: script || "",
-      next_episode_promise: next_episode_promise || "",
-    })
-    .eq("id", id);
+export async function deleteVideo(id: string): Promise<CreateVideoResult> {
+  const trimmed = id.trim();
+  if (!trimmed) {
+    return { ok: false, error: "Video id is missing." };
+  }
 
-  if (error) {
-    const tableHint = videosErrorMessage(error);
-    const dup =
-      error.code === "23505" ||
-      error.message.toLowerCase().includes("duplicate") ||
-      error.message.includes("videos_channel_episode_unique");
-    const hint =
-      tableHint ??
-      (dup
-        ? "That episode code is already used for this channel. Choose another from the list."
-        : error.message.includes("next_episode_promise") || error.code === "PGRST204"
-          ? "Run supabase/migrations/008_videos_next_episode_promise.sql (or npm run db:push -- --yes). See SETUP-SUPABASE.md."
-          : error.message.includes("status") || error.code === "PGRST204"
-            ? "Run supabase/migrations/007_videos_status.sql (or npm run db:push -- --yes). See SETUP-SUPABASE.md."
-            : error.message.includes("episode") || error.code === "PGRST204"
-              ? "Run supabase/migrations/006_videos_episode.sql (or npm run db:push -- --yes). See SETUP-SUPABASE.md."
-              : error.message.includes("row-level security") || error.code === "42501"
-                ? "Run supabase/migrations/004_videos_update_policy.sql in the SQL Editor."
-                : null);
-    return {
-      ok: false,
-      error: hint ?? error.message,
-    };
+  try {
+    await query(`delete from public.videos where id = $1`, [trimmed]);
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "Could not delete video." };
   }
 
   revalidatePath("/");

@@ -1,11 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { updateVideo } from "@/app/actions/videos";
+import { listScriptVersions, saveScriptVersion } from "@/app/actions/script-versions";
 import { VideoEpisodeStatusRow } from "@/components/videos/video-episode-status-row";
 import { defaultEpisodeForNewVideo } from "@/lib/episode";
 import type { VideoRow } from "@/lib/types/video";
+import type { ScriptVersionRow, ScriptType } from "@/lib/types/script-version";
 
 export function EditVideoForm({
   video,
@@ -23,6 +25,36 @@ export function EditVideoForm({
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Controlled values so loading a past version updates the textarea.
+  const [scriptValue, setScriptValue] = useState(video.script ?? "");
+  const [ttsScriptValue, setTtsScriptValue] = useState(video.tts_script ?? "");
+
+  const [versions, setVersions] = useState<ScriptVersionRow[]>([]);
+  const [loadedScriptVersion, setLoadedScriptVersion] = useState<number | null>(null);
+  const [loadedTtsVersion, setLoadedTtsVersion] = useState<number | null>(null);
+  const [savingVersion, setSavingVersion] = useState<ScriptType | null>(null);
+  const [versionError, setVersionError] = useState<string | null>(null);
+
+  // Fetch existing versions for this video on mount.
+  useEffect(() => {
+    let cancelled = false;
+    void listScriptVersions(video.id).then((data) => {
+      if (!cancelled) setVersions(data);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [video.id]);
+
+  const scriptVersions = useMemo(
+    () => versions.filter((v) => v.script_type === "script"),
+    [versions],
+  );
+  const ttsVersions = useMemo(
+    () => versions.filter((v) => v.script_type === "tts_script"),
+    [versions],
+  );
+
   const defaultEpisode = useMemo(() => {
     const cur = video.episode?.trim();
     if (cur) return cur;
@@ -34,6 +66,10 @@ export function EditVideoForm({
     setError(null);
     const form = e.currentTarget;
     const fd = new FormData(form);
+    // Controlled textareas write to the DOM so FormData captures them, but
+    // set explicitly to be safe.
+    fd.set("script", scriptValue);
+    fd.set("tts_script", ttsScriptValue);
 
     setPending(true);
     try {
@@ -46,6 +82,34 @@ export function EditVideoForm({
       router.refresh();
     } finally {
       setPending(false);
+    }
+  }
+
+  async function onSaveVersion(scriptType: ScriptType) {
+    setVersionError(null);
+    setSavingVersion(scriptType);
+    try {
+      const body = scriptType === "script" ? scriptValue : ttsScriptValue;
+      const result = await saveScriptVersion(video.id, scriptType, body);
+      if (!result.ok) {
+        setVersionError(result.error);
+        return;
+      }
+      setVersions((prev) => [...prev, result.version]);
+      if (scriptType === "script") setLoadedScriptVersion(result.version.version_number);
+      else setLoadedTtsVersion(result.version.version_number);
+    } finally {
+      setSavingVersion(null);
+    }
+  }
+
+  function loadVersion(v: ScriptVersionRow) {
+    if (v.script_type === "script") {
+      setScriptValue(v.body);
+      setLoadedScriptVersion(v.version_number);
+    } else {
+      setTtsScriptValue(v.body);
+      setLoadedTtsVersion(v.version_number);
     }
   }
 
@@ -105,22 +169,35 @@ export function EditVideoForm({
             />
           </div>
 
-          <div>
-            <label
-              htmlFor="edit-video-script"
-              className="mb-1.5 block text-label font-medium text-foreground"
-            >
-              Script
-            </label>
-            <textarea
-              id="edit-video-script"
-              name="script"
-              rows={14}
-              defaultValue={video.script}
-              placeholder="Outline, full script, or notes…"
-              className="w-full resize-y rounded-md border border-border bg-paper px-3 py-2 font-serif text-body leading-7 text-foreground shadow-sm outline-none ring-accent/30 placeholder:text-muted focus:ring-2 dark:bg-paper-light/30"
-            />
-          </div>
+          {/* Script with versioning */}
+          <ScriptField
+            htmlId="edit-video-script"
+            label="Script"
+            value={scriptValue}
+            onChange={setScriptValue}
+            rows={14}
+            placeholder="Outline, full script, or notes…"
+            versions={scriptVersions}
+            loadedVersion={loadedScriptVersion}
+            onLoadVersion={loadVersion}
+            onSaveVersion={() => onSaveVersion("script")}
+            saving={savingVersion === "script"}
+          />
+
+          {/* TTS Script with versioning */}
+          <ScriptField
+            htmlId="edit-video-tts-script"
+            label="TTS Script"
+            value={ttsScriptValue}
+            onChange={setTtsScriptValue}
+            rows={14}
+            placeholder="Narration or voice-over text optimized for TTS…"
+            versions={ttsVersions}
+            loadedVersion={loadedTtsVersion}
+            onLoadVersion={loadVersion}
+            onSaveVersion={() => onSaveVersion("tts_script")}
+            saving={savingVersion === "tts_script"}
+          />
 
           <div>
             <label
@@ -134,11 +211,17 @@ export function EditVideoForm({
               name="next_episode_promise"
               rows={4}
               defaultValue={video.next_episode_promise}
-              placeholder="What you’ll cover next time — outro tease, series hook, or CTA…"
+              placeholder="What you'll cover next time — outro tease, series hook, or CTA…"
               className="w-full resize-y rounded-md border border-border bg-paper px-3 py-2 text-body leading-7 text-foreground shadow-sm outline-none ring-accent/30 placeholder:text-muted focus:ring-2 dark:bg-paper-light/30"
             />
           </div>
         </div>
+
+        {versionError ? (
+          <p className="mt-4 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-meta text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-100">
+            {versionError}
+          </p>
+        ) : null}
 
         {error ? (
           <p className="mt-4 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-meta text-red-900 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-100">
@@ -164,6 +247,82 @@ export function EditVideoForm({
           </button>
         </div>
       </form>
+    </div>
+  );
+}
+
+function ScriptField({
+  htmlId,
+  label,
+  value,
+  onChange,
+  rows,
+  placeholder,
+  versions,
+  loadedVersion,
+  onLoadVersion,
+  onSaveVersion,
+  saving,
+}: {
+  htmlId: string;
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  rows: number;
+  placeholder: string;
+  versions: ScriptVersionRow[];
+  loadedVersion: number | null;
+  onLoadVersion: (v: ScriptVersionRow) => void;
+  onSaveVersion: () => void;
+  saving: boolean;
+}) {
+  const nextVersionNumber = versions.length > 0
+    ? versions[versions.length - 1].version_number + 1
+    : 1;
+
+  return (
+    <div>
+      <div className="mb-1.5 flex items-center justify-between gap-3">
+        <label htmlFor={htmlId} className="text-label font-medium text-foreground">
+          {label}
+        </label>
+        <button
+          type="button"
+          onClick={onSaveVersion}
+          disabled={saving || !value.trim()}
+          className="shrink-0 rounded border border-border px-2.5 py-1 text-meta font-medium text-muted transition-colors hover:border-foreground/30 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          {saving ? "Saving…" : `Save v${nextVersionNumber}`}
+        </button>
+      </div>
+
+      {versions.length > 0 ? (
+        <div className="mb-2 flex flex-wrap gap-1.5">
+          {versions.map((v) => (
+            <button
+              key={v.id}
+              type="button"
+              onClick={() => onLoadVersion(v)}
+              className={`rounded px-2 py-0.5 text-meta transition-colors ${
+                loadedVersion === v.version_number
+                  ? "bg-ink text-paper-light dark:bg-accent dark:text-paper"
+                  : "border border-border text-muted hover:border-foreground/30 hover:text-foreground"
+              }`}
+            >
+              v{v.version_number}
+            </button>
+          ))}
+        </div>
+      ) : null}
+
+      <textarea
+        id={htmlId}
+        rows={rows}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="w-full resize-y rounded-md border border-border bg-paper px-3 py-2 font-serif text-body leading-7 text-foreground shadow-sm outline-none ring-accent/30 placeholder:text-muted focus:ring-2 dark:bg-paper-light/30"
+      />
     </div>
   );
 }

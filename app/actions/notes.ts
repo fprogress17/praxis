@@ -1,24 +1,7 @@
 "use server";
 
-import { createClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
-
-const NOTES_TABLE_HINT =
-  "The notes table is missing. Run praxis-web/supabase/migrations/005_notes.sql (or npm run db:push -- --yes). See SETUP-SUPABASE.md.";
-
-function notesErrorMessage(error: { message: string; code?: string }): string | null {
-  const msg = error.message.toLowerCase();
-  if (
-    error.code === "PGRST205" ||
-    msg.includes("schema cache") ||
-    msg.includes("could not find the table") ||
-    msg.includes("relation \"notes\"") ||
-    msg.includes("does not exist")
-  ) {
-    return NOTES_TABLE_HINT;
-  }
-  return null;
-}
+import { query } from "@/lib/server/db";
 
 export type NoteMutationResult = { ok: true } | { ok: false; error: string };
 
@@ -26,28 +9,21 @@ export async function createNote(formData: FormData): Promise<NoteMutationResult
   const channel_id = String(formData.get("channel_id") ?? "").trim();
   const title = String(formData.get("title") ?? "").trim();
   const body = String(formData.get("body") ?? "").trim();
+  const video_id_raw = String(formData.get("video_id") ?? "").trim();
+  const video_id = video_id_raw.length > 0 ? video_id_raw : null;
 
   if (!channel_id) {
     return { ok: false, error: "Channel is missing." };
   }
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!url || !key) {
-    return { ok: false, error: "Supabase is not configured. Check .env.local." };
-  }
-
-  const supabase = createClient(url, key);
-
-  const { error } = await supabase.from("notes").insert({
-    channel_id,
-    title,
-    body,
-  });
-
-  if (error) {
-    return { ok: false, error: notesErrorMessage(error) ?? error.message };
+  try {
+    await query(
+      `insert into public.notes (channel_id, title, body, video_id)
+       values ($1, $2, $3, $4)`,
+      [channel_id, title, body, video_id],
+    );
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "Could not create note." };
   }
 
   revalidatePath("/");
@@ -63,19 +39,26 @@ export async function updateNote(formData: FormData): Promise<NoteMutationResult
     return { ok: false, error: "Note id is missing." };
   }
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!url || !key) {
-    return { ok: false, error: "Supabase is not configured. Check .env.local." };
+  try {
+    await query(`update public.notes set title = $2, body = $3 where id = $1`, [id, title, body]);
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "Could not update note." };
   }
 
-  const supabase = createClient(url, key);
+  revalidatePath("/");
+  return { ok: true };
+}
 
-  const { error } = await supabase.from("notes").update({ title, body }).eq("id", id);
+export async function deleteNote(formData: FormData): Promise<NoteMutationResult> {
+  const id = String(formData.get("id") ?? "").trim();
+  if (!id) {
+    return { ok: false, error: "Note id is missing." };
+  }
 
-  if (error) {
-    return { ok: false, error: notesErrorMessage(error) ?? error.message };
+  try {
+    await query(`delete from public.notes where id = $1`, [id]);
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "Could not delete note." };
   }
 
   revalidatePath("/");

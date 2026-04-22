@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
+import { updateChannelPositions } from "@/app/actions/channels";
 import { ChannelsPanelRail } from "@/components/layout/channels-panel-rail";
 import { CenterPanel } from "@/components/layout/center-panel";
 import { MobileChannelsCollapsedBar } from "@/components/layout/mobile-channels-collapsed-bar";
@@ -13,25 +14,51 @@ import { NewChannelForm } from "@/components/channels/new-channel-form";
 import { ChannelVideoList } from "@/components/videos/channel-video-list";
 import { EditVideoForm } from "@/components/videos/edit-video-form";
 import { NewVideoForm } from "@/components/videos/new-video-form";
+import { ChannelIdeaList } from "@/components/ideas/channel-idea-list";
+import { NewIdeaForm } from "@/components/ideas/new-idea-form";
+import { NewWorkspaceIdeaForm } from "@/components/ideas/new-workspace-idea-form";
 import type { ChannelRow } from "@/lib/types/channel";
+import type { FileRow } from "@/lib/types/file";
+import type { IdeaRow } from "@/lib/types/idea";
+import type { LinkRow } from "@/lib/types/link";
+import type { WorkspaceIdeaRow } from "@/lib/types/workspace-idea";
+import type { WorkspaceNoteRow } from "@/lib/types/workspace-note";
 import type { NoteRow } from "@/lib/types/note";
 import type { VideoRow } from "@/lib/types/video";
 
-type Mode = "home" | "new-channel" | "new-video" | "edit-video";
+type Mode =
+  | "home"
+  | "new-channel"
+  | "new-workspace-idea"
+  | "new-video"
+  | "new-idea"
+  | "edit-video";
 
 export function PraxisShell({
   initialChannels,
   initialVideos,
   initialNotes,
+  initialFiles,
+  initialLinks,
+  initialIdeas,
+  initialWorkspaceIdeas,
+  initialWorkspaceNotes,
   supabaseConfigured,
 }: {
   initialChannels: ChannelRow[];
   initialVideos: VideoRow[];
   initialNotes: NoteRow[];
+  initialFiles: FileRow[];
+  initialLinks: LinkRow[];
+  initialIdeas: IdeaRow[];
+  initialWorkspaceIdeas: WorkspaceIdeaRow[];
+  initialWorkspaceNotes: WorkspaceNoteRow[];
   supabaseConfigured: boolean;
 }) {
   const [mode, setMode] = useState<Mode>("home");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  // orderedIds tracks drag-reordered channel order; null = use server order.
+  const [orderedIds, setOrderedIds] = useState<string[] | null>(null);
   const [editingVideoId, setEditingVideoId] = useState<string | null>(null);
   /** Desktop (lg+): full channels sidebar vs narrow rail with open button. */
   const [channelsPanelOpen, setChannelsPanelOpen] = useState(true);
@@ -43,20 +70,90 @@ export function PraxisShell({
   const { widthPx: rightPanelWidthPx, dragging: rightPanelDragging, onResizePointerDown } =
     useRightPanelWidth(splitRegionRef, resizeHandleRef);
 
+  const channels = useMemo(() => {
+    const sorted = [...initialChannels].sort(
+      (a, b) => (a.position ?? 9999) - (b.position ?? 9999),
+    );
+    if (!orderedIds) return sorted;
+    const byId = new Map(initialChannels.map((c) => [c.id, c]));
+    const result: ChannelRow[] = [];
+    for (const id of orderedIds) {
+      const ch = byId.get(id);
+      if (ch) result.push(ch);
+    }
+    const inOrder = new Set(orderedIds);
+    for (const ch of sorted) {
+      if (!inOrder.has(ch.id)) result.push(ch);
+    }
+    return result;
+  }, [initialChannels, orderedIds]);
+
   const selected = useMemo(
-    () => initialChannels.find((c) => c.id === selectedId) ?? null,
-    [initialChannels, selectedId],
+    () => channels.find((c) => c.id === selectedId) ?? null,
+    [channels, selectedId],
   );
+
+  function handleReorderChannels(newIds: string[]) {
+    setOrderedIds(newIds);
+    updateChannelPositions(newIds).catch(console.error);
+  }
 
   const channelVideos = useMemo(() => {
     if (!selectedId) return [];
     return initialVideos.filter((v) => v.channel_id === selectedId);
   }, [initialVideos, selectedId]);
 
-  const channelNotes = useMemo(() => {
+  /** Channel home / new video / new idea: notes with no video. Edit video: notes for that video only. */
+  const rightPanelNotes = useMemo(() => {
     if (!selectedId) return [];
-    return initialNotes.filter((n) => n.channel_id === selectedId);
-  }, [initialNotes, selectedId]);
+    const forChannel = initialNotes.filter((n) => n.channel_id === selectedId);
+    if (mode === "edit-video" && editingVideoId) {
+      return forChannel.filter((n) => n.video_id === editingVideoId);
+    }
+    return forChannel.filter((n) => n.video_id == null || n.video_id === "");
+  }, [initialNotes, selectedId, mode, editingVideoId]);
+
+  const notesScope = useMemo((): "workspace" | "channel" | "video" => {
+    if (!selectedId) return "workspace";
+    if (mode === "edit-video" && editingVideoId) return "video";
+    return "channel";
+  }, [selectedId, mode, editingVideoId]);
+
+  const rightPanelFiles = useMemo(() => {
+    if (!selectedId) {
+      return initialFiles.filter((f) => f.channel_id == null && f.video_id == null);
+    }
+    const forChannel = initialFiles.filter((f) => f.channel_id === selectedId);
+    if (mode === "edit-video" && editingVideoId) {
+      return forChannel.filter((f) => f.video_id === editingVideoId);
+    }
+    return forChannel.filter((f) => f.video_id == null || f.video_id === "");
+  }, [initialFiles, selectedId, mode, editingVideoId]);
+
+  const rightPanelLinks = useMemo(() => {
+    if (!selectedId) {
+      return initialLinks.filter((link) => link.channel_id == null && link.video_id == null);
+    }
+    const forChannel = initialLinks.filter((link) => link.channel_id === selectedId);
+    if (mode === "edit-video" && editingVideoId) {
+      return forChannel.filter((link) => link.video_id === editingVideoId);
+    }
+    return forChannel.filter((link) => link.video_id == null || link.video_id === "");
+  }, [initialLinks, selectedId, mode, editingVideoId]);
+
+  const workspaceNotesSorted = useMemo(
+    () =>
+      [...initialWorkspaceNotes].sort((a, b) => b.created_at.localeCompare(a.created_at)),
+    [initialWorkspaceNotes],
+  );
+
+  const channelIdeas = useMemo(() => {
+    if (!selectedId) return [];
+    return initialIdeas
+      .filter((i) => i.channel_id === selectedId)
+      .slice()
+      .sort((a, b) => b.created_at.localeCompare(a.created_at));
+  }, [initialIdeas, selectedId]);
 
   const editingVideo = useMemo(
     () => (editingVideoId ? initialVideos.find((v) => v.id === editingVideoId) ?? null : null),
@@ -64,20 +161,28 @@ export function PraxisShell({
   );
 
   const contextTitle =
-    mode === "new-video" && selected
-      ? "New video"
-      : mode === "edit-video" && editingVideo
-        ? editingVideo.title
-        : (selected?.title ?? "Workspace");
+    mode === "new-workspace-idea"
+      ? "New channel idea"
+      : mode === "new-video" && selected
+        ? "New video"
+        : mode === "new-idea" && selected
+          ? "New idea"
+          : mode === "edit-video" && editingVideo
+            ? editingVideo.title
+            : (selected?.title ?? "Workspace");
 
   const contextDetail =
-    mode === "new-video" && selected
-      ? `Adding to “${selected.title}”`
-      : mode === "edit-video" && editingVideo && selected
-        ? `Editing in “${selected.title}”`
-        : selected
-          ? `${selected.category}${selected.brief_note ? ` · ${selected.brief_note.slice(0, 80)}${selected.brief_note.length > 80 ? "…" : ""}` : ""}`
-          : "Pick a channel or create one with New channel.";
+    mode === "new-workspace-idea"
+      ? "Not tied to a channel yet — listed under your channels"
+      : mode === "new-video" && selected
+        ? `Adding to “${selected.title}”`
+        : mode === "new-idea" && selected
+          ? `Idea for “${selected.title}”`
+          : mode === "edit-video" && editingVideo && selected
+            ? `Editing in “${selected.title}”`
+            : selected
+              ? `${selected.category}${selected.brief_note ? ` · ${selected.brief_note.slice(0, 80)}${selected.brief_note.length > 80 ? "…" : ""}` : ""}`
+              : "Pick a channel or create one with New channel.";
 
   const collapseChannelsForVideo = () => {
     setChannelsPanelOpen(false);
@@ -86,6 +191,14 @@ export function PraxisShell({
 
   const openNewChannel = () => {
     setMode("new-channel");
+    setSelectedId(null);
+    setEditingVideoId(null);
+    setChannelsPanelOpen(true);
+    setMobileChannelsOpen(true);
+  };
+
+  const openWorkspaceIdea = () => {
+    setMode("new-workspace-idea");
     setSelectedId(null);
     setEditingVideoId(null);
     setChannelsPanelOpen(true);
@@ -102,6 +215,13 @@ export function PraxisShell({
     setSelectedId(channelId);
     setEditingVideoId(null);
     setMode("new-video");
+    collapseChannelsForVideo();
+  };
+
+  const openAddIdea = (channelId: string) => {
+    setSelectedId(channelId);
+    setEditingVideoId(null);
+    setMode("new-idea");
     collapseChannelsForVideo();
   };
 
@@ -127,15 +247,34 @@ export function PraxisShell({
     setMobileChannelsOpen(true);
   };
 
-  const videoFlowActive = mode === "new-video" || mode === "edit-video";
-  const showMobileCollapsed = videoFlowActive && !mobileChannelsOpen;
+  const composerFlowActive =
+    mode === "new-video" || mode === "new-idea" || mode === "edit-video";
+  const showMobileCollapsed = composerFlowActive && !mobileChannelsOpen;
 
   const mobileBarSubtitle =
-    mode === "edit-video" ? "Edit video" : "New video";
+    mode === "edit-video" ? "Edit video" : mode === "new-idea" ? "New idea" : "New video";
 
   const renderCenter = () => {
     if (mode === "new-channel") {
       return <NewChannelForm onCancel={() => setMode("home")} />;
+    }
+
+    if (mode === "new-workspace-idea") {
+      return (
+        <div>
+          <div className="mb-3 text-micro font-semibold uppercase tracking-[0.08em] text-muted">
+            Workspace
+          </div>
+          <h1 className="font-serif text-display leading-none tracking-[-0.02em] text-foreground">
+            New channel idea
+          </h1>
+          <p className="mt-4 max-w-[44rem] text-body leading-7 text-muted">
+            For a channel you don’t have yet. After you save, it appears under your channel list in the
+            sidebar.
+          </p>
+          <NewWorkspaceIdeaForm onCancel={() => setMode("home")} />
+        </div>
+      );
     }
 
     if (mode === "new-video" && selected) {
@@ -151,9 +290,31 @@ export function PraxisShell({
             {selected.brief_note || "No brief note yet."}
           </p>
           <NewVideoForm
+            key={`new-video:${selected.id}`}
             channelId={selected.id}
             channelTitle={selected.title}
             usedEpisodes={channelVideos.map((v) => v.episode)}
+            onCancel={exitVideoComposer}
+          />
+        </div>
+      );
+    }
+
+    if (mode === "new-idea" && selected) {
+      return (
+        <div>
+          <div className="mb-3 text-micro font-semibold uppercase tracking-[0.08em] text-muted">
+            Workspace
+          </div>
+          <h1 className="font-serif text-display leading-none tracking-[-0.02em] text-foreground">
+            {selected.title}
+          </h1>
+          <p className="mt-4 max-w-[44rem] text-body leading-7 text-muted">
+            {selected.brief_note || "No brief note yet."}
+          </p>
+          <NewIdeaForm
+            channelId={selected.id}
+            channelTitle={selected.title}
             onCancel={exitVideoComposer}
           />
         </div>
@@ -216,7 +377,10 @@ export function PraxisShell({
         </p>
 
         {selected ? (
-          <ChannelVideoList videos={channelVideos} onSelectVideo={openEditVideo} />
+          <>
+            <ChannelVideoList videos={channelVideos} onSelectVideo={openEditVideo} />
+            <ChannelIdeaList ideas={channelIdeas} />
+          </>
         ) : null}
       </div>
     );
@@ -232,24 +396,33 @@ export function PraxisShell({
         />
       ) : (
         <MobileNav
-          channels={initialChannels}
+          channels={channels}
           onNewChannel={openNewChannel}
+          onWorkspaceIdea={openWorkspaceIdea}
+          workspaceIdeas={initialWorkspaceIdeas}
           onGoHome={goHome}
           selectedId={selectedId}
           onSelectChannel={selectChannel}
           onAddVideo={openAddVideo}
+          onAddIdea={openAddIdea}
+          supabaseConfigured={supabaseConfigured}
         />
       )}
 
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
         {channelsPanelOpen ? (
           <Sidebar
-            channels={initialChannels}
+            channels={channels}
             onNewChannel={openNewChannel}
+            onWorkspaceIdea={openWorkspaceIdea}
+            workspaceIdeas={initialWorkspaceIdeas}
             onGoHome={goHome}
             selectedId={selectedId}
             onSelectChannel={selectChannel}
             onAddVideo={openAddVideo}
+            onAddIdea={openAddIdea}
+            onReorderChannels={handleReorderChannels}
+            supabaseConfigured={supabaseConfigured}
           />
         ) : (
           <ChannelsPanelRail onOpen={() => setChannelsPanelOpen(true)} />
@@ -262,16 +435,13 @@ export function PraxisShell({
           <CenterPanel>
             {!supabaseConfigured ? (
               <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-body text-amber-950 dark:border-amber-900/40 dark:bg-amber-950/30 dark:text-amber-100">
-                <p className="font-medium">Supabase env vars missing</p>
+                <p className="font-medium">Local database config missing</p>
                 <p className="mt-2 text-meta leading-6 opacity-90">
                   Copy <code className="rounded bg-black/5 px-1 dark:bg-white/10">.env.example</code>{" "}
                   to <code className="rounded bg-black/5 px-1 dark:bg-white/10">.env.local</code> and
-                  add your project URL and anon key. Then run the SQL in{" "}
-                  <code className="rounded bg-black/5 px-1 dark:bg-white/10">
-                    supabase/migrations/001_channels.sql
-                  </code>{" "}
-                  (see <code className="rounded bg-black/5 px-1 dark:bg-white/10">SETUP-SUPABASE.md</code>
-                  ).
+                  add <code className="rounded bg-black/5 px-1 dark:bg-white/10">DATABASE_URL</code>.
+                  Optional: set <code className="rounded bg-black/5 px-1 dark:bg-white/10">FILE_STORAGE_ROOT</code>{" "}
+                  if you want files outside the default local storage folder.
                 </p>
               </div>
             ) : null}
@@ -288,8 +458,13 @@ export function PraxisShell({
           <RightPanel
             contextTitle={contextTitle}
             contextDetail={contextDetail}
+            notesScope={notesScope}
             channelId={selectedId}
-            channelNotes={channelNotes}
+            videoId={mode === "edit-video" && editingVideoId ? editingVideoId : null}
+            workspaceNotes={workspaceNotesSorted}
+            channelNotes={rightPanelNotes}
+            files={rightPanelFiles}
+            links={rightPanelLinks}
             supabaseConfigured={supabaseConfigured}
             widthPx={rightPanelWidthPx}
           />
