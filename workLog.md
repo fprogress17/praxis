@@ -7,7 +7,7 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 ## 2026-04-22 — Commit archival source docs, extension scaffold, and legacy migrations
 
 **Time:** 16:36 EDT  
-**Commit:** (pending)  
+**Commit:** `f237c98`  
 **What:** Added the embedded-browser design note, Chrome extension scaffold, and legacy Supabase migration files to git as archival/reference material. Also committed the ESLint config ignore update that keeps generated files out of lint. Re-ran `npm run typecheck`, `npm run lint`, and `npm run smoke:local`.  
 **Cause:** These files were still only present in the local working tree even though they document or preserve historical product/runtime paths that are useful for migration and future feature work.  
 **Fix / outcome:** The repo now preserves the relevant historical source material and lint behavior, while user-side scratch files remain untouched.  
