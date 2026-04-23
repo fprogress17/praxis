@@ -34,11 +34,18 @@ Open [http://localhost:3000](http://localhost:3000).
 ## Split Runtime Dev
 
 ```bash
-npm run backend:dev
+npm run backend:start
 npm run dev:split -- 3003
 ```
 
 Open [http://localhost:3003](http://localhost:3003).
+
+Check or stop the backend:
+
+```bash
+npm run backend:status
+npm run backend:stop
+```
 
 ## Next step
 

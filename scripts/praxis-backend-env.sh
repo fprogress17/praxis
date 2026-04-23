@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT_DIR"
+
+if [[ -f .env.local ]]; then
+  set -a
+  # shellcheck disable=SC1091
+  source .env.local
+  set +a
+fi
+
+export PRAXIS_BACKEND_HOST="${PRAXIS_BACKEND_HOST:-127.0.0.1}"
+export PRAXIS_BACKEND_PORT="${PRAXIS_BACKEND_PORT:-4001}"
+
+CLIENT_HOST="${PRAXIS_BACKEND_CLIENT_HOST:-$PRAXIS_BACKEND_HOST}"
+if [[ "$CLIENT_HOST" == "0.0.0.0" ]]; then
+  CLIENT_HOST="127.0.0.1"
+fi
+export PRAXIS_BACKEND_CLIENT_HOST="$CLIENT_HOST"
+export PRAXIS_BACKEND_URL="http://${PRAXIS_BACKEND_CLIENT_HOST}:${PRAXIS_BACKEND_PORT}"
+
+export PRAXIS_RUNTIME_DIR="${PRAXIS_RUNTIME_DIR:-$ROOT_DIR/.runtime}"
+export PRAXIS_BACKEND_PID_FILE="${PRAXIS_BACKEND_PID_FILE:-$PRAXIS_RUNTIME_DIR/praxis-backend.pid}"
+export PRAXIS_BACKEND_LOG_FILE="${PRAXIS_BACKEND_LOG_FILE:-$PRAXIS_RUNTIME_DIR/praxis-backend.log}"
+
+export NEXT_PUBLIC_API_BASE_URL="${NEXT_PUBLIC_API_BASE_URL:-$PRAXIS_BACKEND_URL}"
+export PRAXIS_API_BASE_URL="${PRAXIS_API_BASE_URL:-$PRAXIS_BACKEND_URL}"
+
+mkdir -p "$PRAXIS_RUNTIME_DIR"
