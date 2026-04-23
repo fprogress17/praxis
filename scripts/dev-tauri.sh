@@ -11,4 +11,4 @@ cleanup() {
 trap cleanup EXIT
 
 bash "$ROOT_DIR/scripts/start-backend.sh"
-exec npx tauri dev
+npx tauri dev
