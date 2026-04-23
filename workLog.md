@@ -4,6 +4,17 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 
 ---
 
+## 2026-04-22 — Add optional frontend target for standalone backend
+
+**Time:** 21:31 EDT  
+**Commit:** `ed1ef9f`  
+**What:** Added shared API URL helpers so the frontend can optionally target a standalone backend via `NEXT_PUBLIC_API_BASE_URL` / `PRAXIS_API_BASE_URL`, switched client fetch callsites and homepage bootstrap loading to use that base, and added local-dev CORS handling to the standalone backend. Re-ran `npm run typecheck`, `npm run lint`, `npm run build`, and `npm run smoke:local`, then live-verified `http://127.0.0.1:4001/api/bootstrap` plus CORS/preflight headers for origin `http://localhost:3000`.  
+**Cause:** The standalone backend existed, but the frontend still hardcoded same-origin `/api/*` requests, which meant there was no safe way to point the UI at the separate process while preserving rollback.  
+**Fix / outcome:** Praxis can now be configured to use the standalone backend process as its API target without removing the current in-process Next route path.  
+**Agent:** Codex
+
+---
+
 ## 2026-04-22 — Add first standalone backend process
 
 **Time:** 21:25 EDT  
