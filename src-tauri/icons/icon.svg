@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-label="Praxis app icon">
+  <defs>
+    <linearGradient id="paper" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f6f1e8" />
+      <stop offset="100%" stop-color="#ebe3d7" />
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#000000" flood-opacity="0.12" />
+    </filter>
+  </defs>
+  <rect width="1024" height="1024" rx="240" fill="url(#paper)" />
+  <rect x="64" y="64" width="896" height="896" rx="212" fill="none" stroke="#d7cec1" stroke-width="10" />
+  <g filter="url(#shadow)">
+    <path
+      d="M777 283c-72-71-168-111-269-111-208 0-379 171-379 379 0 97 38 190 105 260 31 32 84 7 84-37 0-20-8-39-22-53-43-46-67-106-67-170 0-152 126-278 279-278 68 0 133 25 183 70 34 31 87 8 87-38 0-8-1-15-1-22z"
+      fill="none"
+      stroke="#171515"
+      stroke-width="112"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <path
+      d="M713 622c0 63-52 115-115 115-38 0-74-19-95-50"
+      fill="none"
+      stroke="#171515"
+      stroke-width="62"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      opacity="0.92"
+    />
+  </g>
+  <g transform="translate(654 654)">
+    <rect width="208" height="208" rx="28" fill="#ad2a1f" />
+    <path
+      d="M53 142h102M82 55v98M82 55h74M156 55v98"
+      fill="none"
+      stroke="#f7f2ea"
+      stroke-width="20"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  </g>
+</svg>

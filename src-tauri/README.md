@@ -38,6 +38,8 @@ The default desktop dev shell now targets that managed runtime through the Rust 
 Native runtime management scaffold:
 
 - `src-tauri/src/runtime.rs` now contains app-side process orchestration for backend/frontend startup and shutdown
+- `src-tauri/src/window_state.rs` now persists the last main-window size/position and restores it on relaunch
+- desktop icon assets now come from `src-tauri/icons/icon.svg` plus generated bundle icons
 - it is gated behind `PRAXIS_DESKTOP_MANAGED_RUNTIME=1`
 - this is preparation for packaged startup, not the default dev-shell path yet
 
