@@ -4,6 +4,17 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 
 ---
 
+## 2026-04-23 — Fix packaged launcher handoff from splash page to local app URL
+
+**Time:** 13:21 EDT  
+**Commit:** `PENDING`  
+**What:** Replaced the packaged desktop launcher’s `fetch()`-based readiness polling in `desktop-launcher/index.html` with an iframe-based probe that waits for the local app URL to load and then hands off via `window.location.replace()`. Rebuilt and reinstalled `/Applications/Praxis.app`, then relaunched it and confirmed the packaged app again brought up the local server at `http://127.0.0.1:3007/`.  
+**Cause:** The packaged splash page was still showing “could not reach the local frontend” even while the bundled local server was healthy, which indicated the handoff probe was failing at the browser-origin/CORS layer rather than the server actually being down.  
+**Fix / outcome:** The launcher no longer depends on `fetch()` from the packaged origin to detect readiness, so it can hand off to the healthy local Praxis UI without getting stuck on the splash error page.  
+**Agent:** Codex
+
+---
+
 ## 2026-04-23 — Fix packaged app launch from Applications by using absolute Node path
 
 **Time:** 13:03 EDT  

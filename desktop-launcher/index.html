@@ -103,17 +103,31 @@
       const status = document.getElementById("status");
       const start = Date.now();
 
-      async function waitForFrontend() {
-        try {
-          const response = await fetch(targetUrl, { cache: "no-store", mode: "cors" });
-          if (response.ok) {
-            status.textContent = "Opening Praxis…";
-            window.location.replace(targetUrl);
-            return;
-          }
-        } catch (_error) {
-        }
+      function probeFrontend() {
+        const iframe = document.createElement("iframe");
+        iframe.style.display = "none";
+        iframe.src = `${targetUrl}?desktop_probe=${Date.now()}`;
 
+        const cleanup = () => {
+          iframe.onload = null;
+          iframe.onerror = null;
+          iframe.remove();
+        };
+
+        iframe.onload = () => {
+          cleanup();
+          status.textContent = "Opening Praxis…";
+          window.location.replace(targetUrl);
+        };
+
+        iframe.onerror = () => {
+          cleanup();
+        };
+
+        document.body.appendChild(iframe);
+      }
+
+      function waitForFrontend() {
         if (Date.now() - start > 30000) {
           status.classList.add("error");
           status.textContent =
@@ -121,6 +135,7 @@
           return;
         }
 
+        probeFrontend();
         setTimeout(waitForFrontend, 500);
       }
 
