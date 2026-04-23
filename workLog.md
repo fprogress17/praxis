@@ -7,7 +7,7 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 ## 2026-04-23 — Verify desktop shell launch and fix dev integration issues
 
 **Time:** 07:27 EDT  
-**Commit:** `(pending)`  
+**Commit:** `19e209b`  
 **What:** Ran the real `npm run desktop:dev` Tauri path, confirmed the managed backend on `127.0.0.1:4001`, the split frontend on `127.0.0.1:3006`, and the native shell binary all launched together, then fixed two integration issues: Next dev-origin blocking for the Tauri webview and stale backend PID cleanup on shell exit. Re-ran `npm run typecheck`, `npm run build`, and repeated the real desktop dev launch until exit left `backend:status` clean.  
 **Cause:** The first Tauri scaffold compiled, but only a real shell launch could expose webview/dev-server integration issues and process-lifecycle edge cases.  
 **Fix / outcome:** The desktop dev shell now launches cleanly against the managed backend and shuts down without leaving stale backend state behind, which makes the shell path reliable enough for the next packaging step.  
