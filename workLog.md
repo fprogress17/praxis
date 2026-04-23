@@ -4,6 +4,17 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 
 ---
 
+## 2026-04-22 — Add first standalone backend process
+
+**Time:** 21:25 EDT  
+**Commit:** `3474249`  
+**What:** Added a local-only standalone backend under `backend/` with a small alias loader, wired `npm run backend:dev`, loaded `.env.local` automatically, and served the same API surface as the current Next route handlers against the existing Postgres/file-storage helpers. Verified with `npm run typecheck`, `npm run lint`, `npm run build`, `npm run smoke:local`, plus live `curl` checks to `http://127.0.0.1:4001/health` and `http://127.0.0.1:4001/api/bootstrap`.  
+**Cause:** The frontend had already been cut over to explicit API calls, so the next safe step toward a MediaLedger-style architecture was introducing a separate backend process without changing the working app runtime yet.  
+**Fix / outcome:** Praxis now has a standalone backend checkpoint that runs locally on `127.0.0.1:4001` by default and can serve the existing API surface independently of Next.  
+**Agent:** Codex
+
+---
+
 ## 2026-04-22 — Remove remaining client-side Next server-action imports
 
 **Time:** 21:17 EDT  
