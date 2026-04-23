@@ -75,14 +75,7 @@ type Route = {
 
 function allowedOrigins() {
   const raw = process.env.PRAXIS_ALLOWED_ORIGINS?.trim();
-  if (!raw) {
-    return new Set([
-      "http://localhost:3000",
-      "http://127.0.0.1:3000",
-      "http://localhost:3002",
-      "http://127.0.0.1:3002",
-    ]);
-  }
+  if (!raw) return null;
 
   return new Set(
     raw
@@ -94,7 +87,10 @@ function allowedOrigins() {
 
 function corsHeaders(origin: string | null) {
   if (!origin) return {} as Record<string, string>;
-  if (!allowedOrigins().has(origin)) return {} as Record<string, string>;
+  const configured = allowedOrigins();
+  const localDevOrigin = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+  const allowed = configured ? configured.has(origin) : localDevOrigin;
+  if (!allowed) return {} as Record<string, string>;
   return {
     "access-control-allow-origin": origin,
     "access-control-allow-methods": "GET,POST,PATCH,DELETE,OPTIONS",

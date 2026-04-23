@@ -1,9 +1,13 @@
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
+import { proxyApiRequest } from "@/lib/server/api-proxy";
 import { dbConfigured } from "@/lib/server/db";
 import { parseScope, uploadStorageFiles } from "@/lib/server/files";
 
 export async function POST(request: Request) {
+  const proxied = await proxyApiRequest(request, "/api/files");
+  if (proxied) return proxied;
+
   if (!dbConfigured()) {
     return NextResponse.json({ ok: false, error: "DATABASE_URL is not configured." }, { status: 500 });
   }

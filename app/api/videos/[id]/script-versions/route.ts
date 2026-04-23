@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { ScriptType } from "@/lib/types/script-version";
+import { proxyApiRequest } from "@/lib/server/api-proxy";
 import { dbConfigured } from "@/lib/server/db";
 import {
   listVideoScriptVersions,
@@ -14,15 +15,17 @@ function isScriptType(value: unknown): value is ScriptType {
   return value === "script" || value === "tts_script";
 }
 
-export async function GET(_request: Request, context: RouteContext) {
+export async function GET(request: Request, context: RouteContext) {
+  const { id } = await context.params;
+  const proxied = await proxyApiRequest(request, `/api/videos/${id}/script-versions`);
+  if (proxied) return proxied;
+
   if (!dbConfigured()) {
     return NextResponse.json(
       { ok: false, error: "DATABASE_URL is not configured." },
       { status: 500 },
     );
   }
-
-  const { id } = await context.params;
 
   try {
     const versions = await listVideoScriptVersions(id);
@@ -39,6 +42,10 @@ export async function GET(_request: Request, context: RouteContext) {
 }
 
 export async function POST(request: Request, context: RouteContext) {
+  const { id } = await context.params;
+  const proxied = await proxyApiRequest(request, `/api/videos/${id}/script-versions`);
+  if (proxied) return proxied;
+
   if (!dbConfigured()) {
     return NextResponse.json(
       { ok: false, error: "DATABASE_URL is not configured." },
@@ -46,7 +53,6 @@ export async function POST(request: Request, context: RouteContext) {
     );
   }
 
-  const { id } = await context.params;
   const body = (await request.json()) as {
     scriptType?: unknown;
     body?: unknown;
