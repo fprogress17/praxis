@@ -7,7 +7,7 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 ## 2026-04-23 — Archive legacy Next server-action wrappers
 
 **Time:** 06:58 EDT  
-**Commit:** `(pending)`  
+**Commit:** `22c33a8`  
 **What:** Moved the unused `app/actions/*` server-action wrappers into `archive/next-server-actions/`, added an archive README explaining their status, and verified there are no remaining live imports of `app/actions/*`. Re-ran `npm run typecheck`, `npm run lint`, `npm run build`, and `npm run smoke:local`.  
 **Cause:** After the API and standalone-backend cutover, the old server-action layer was no longer part of the runtime but still sat in the active app tree, which made the architecture look more coupled than it actually is.  
 **Fix / outcome:** The active runtime tree now reflects the real architecture more clearly, while the old wrappers remain preserved as reference material under `archive/`.  
