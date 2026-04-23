@@ -7,7 +7,7 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 ## 2026-04-23 — Make installed Praxis.app launch without the repo checkout
 
 **Time:** 12:58 EDT  
-**Commit:** `PENDING`  
+**Commit:** `0636308`  
 **What:** Switched Next to `output: "standalone"` in `next.config.ts`, added `scripts/prepare-desktop-bundle.mjs` to stage the standalone server into `src-tauri/bundled/`, updated `src-tauri/tauri.conf.json` to bundle those resources, changed `src-tauri/src/runtime.rs` so packaged release builds start the bundled standalone Next server from inside the app instead of the repo backend/frontend scripts, added `scripts/install-desktop-app.mjs` plus `npm run desktop:install`, and excluded the generated bundled server output from ESLint. Rebuilt the app, installed `/Applications/Praxis.app`, synced `.env.local` and file storage into `~/Library/Application Support/com.praxis.desktop/`, launched the installed app, and verified it served `HTTP 200` from `http://127.0.0.1:3007/`.  
 **Cause:** The first packaged app in `/Applications` still depended on the repo checkout because it launched the workspace runtime directly, so it was visible as an app but not actually self-sufficient on this machine.  
 **Fix / outcome:** The installed macOS app now carries its own standalone Next server inside the bundle and uses Application Support for env, file storage, and window state. On this machine it can now launch from `/Applications` without calling back into the repo checkout.  
