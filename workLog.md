@@ -7,7 +7,7 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 ## 2026-04-23 — Add desktop LAN settings page and optional local-network sharing
 
 **Time:** 14:24 EDT  
-**Commit:** `PENDING`  
+**Commit:** `18942f3`  
 **What:** Added a dedicated desktop settings page at `/settings`, linked it from new gear icons in the main sidebar and mobile header, added a LAN-sharing toggle plus Mac IP and iPad URL display, and introduced `app/api/settings/desktop` with persisted desktop settings storage. Updated the packaged Tauri runtime and desktop install flow so the installed app reads `desktop-settings.txt`, defaults new installs to `share_on_local_network=1`, and binds to either `127.0.0.1` or `0.0.0.0` on relaunch based on that saved setting. Rebuilt and reinstalled `/Applications/Praxis.app`, then verified the installed app served the new settings page, returned the Mac IP plus iPad URL from `/api/settings/desktop`, persisted the toggle, and relaunched in both local-only and LAN-share modes.  
 **Cause:** Praxis could already run as a packaged Mac app, but it had no user-facing control for Wi-Fi sharing, no settings screen, and no clear way to discover the Mac LAN address or the URL an iPad should open. The packaged runtime also needed a reliable desktop-settings path instead of depending only on an environment variable.  
 **Fix / outcome:** The desktop app now has a separate settings UI for LAN sharing, shows the exact iPad URL, persists the share preference, and applies it on the next app launch so the installed app can intentionally expose or hide the workspace on the local network.  
