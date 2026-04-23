@@ -4,6 +4,17 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 
 ---
 
+## 2026-04-23 — Fix packaged app data bootstrap to load local Postgres data
+
+**Time:** 13:26 EDT  
+**Commit:** `PENDING`  
+**What:** Fixed the packaged desktop data path so it no longer points at the old split backend. Updated `src-tauri/src/runtime.rs` to blank `NEXT_PUBLIC_API_BASE_URL` and `PRAXIS_API_BASE_URL` in packaged release startup, updated `scripts/install-desktop-app.mjs` to strip those stale env lines from the installed desktop `.env.local`, and changed `package.json` so `npm run desktop:build` clears those API-base vars at build time before producing the standalone bundle. Rebuilt and reinstalled `/Applications/Praxis.app`, then verified `http://127.0.0.1:3007/api/bootstrap` returned the real workspace payload with channels, videos, notes, files, links, and ideas from local Postgres.  
+**Cause:** The packaged app UI and API routes were still carrying the old `127.0.0.1:4001` split-backend base URL from the desktop environment and build environment, so the app loaded successfully but fell back to an empty workspace because bootstrap requests were proxying to a backend that no longer exists in packaged mode.  
+**Fix / outcome:** The installed Praxis app now uses its own packaged local server and reads data directly from the configured local Postgres database instead of trying to proxy bootstrap through the retired split backend.  
+**Agent:** Codex
+
+---
+
 ## 2026-04-23 — Fix packaged launcher handoff from splash page to local app URL
 
 **Time:** 13:21 EDT  

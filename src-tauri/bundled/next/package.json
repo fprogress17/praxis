@@ -16,7 +16,7 @@
     "frontend:restart": "bash scripts/stop-frontend.sh && bash scripts/start-frontend.sh",
     "dev:split": "bash scripts/dev-split-frontend.sh",
     "desktop:dev": "bash scripts/dev-tauri-native-managed.sh",
-    "desktop:build": "npm run build && node scripts/prepare-desktop-bundle.mjs && npm exec -- tauri build --config src-tauri/tauri.conf.json",
+    "desktop:build": "NEXT_PUBLIC_API_BASE_URL= PRAXIS_API_BASE_URL= npm run build && node scripts/prepare-desktop-bundle.mjs && npm exec -- tauri build --config src-tauri/tauri.conf.json",
     "desktop:install": "node scripts/install-desktop-app.mjs",
     "desktop:dev:split": "bash scripts/dev-tauri.sh",
     "desktop:dev:scripted": "bash scripts/dev-tauri-runtime.sh",

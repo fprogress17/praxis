@@ -43,7 +43,16 @@ await fs.cp(builtApp, applicationsApp, { recursive: true });
 await fs.mkdir(appSupportDir, { recursive: true });
 
 if (await exists(envSource)) {
-  await fs.copyFile(envSource, envTarget);
+  const envText = await fs.readFile(envSource, "utf8");
+  const filteredEnv = envText
+    .split("\n")
+    .filter(
+      (line) =>
+        !line.startsWith("NEXT_PUBLIC_API_BASE_URL=") &&
+        !line.startsWith("PRAXIS_API_BASE_URL="),
+    )
+    .join("\n");
+  await fs.writeFile(envTarget, filteredEnv.endsWith("\n") ? filteredEnv : `${filteredEnv}\n`);
 }
 
 if (await exists(storageSource)) {

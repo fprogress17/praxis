@@ -177,6 +177,8 @@ impl ManagedRuntimeConfig {
             frontend_env_overrides: vec![
                 ("HOSTNAME".to_string(), "127.0.0.1".to_string()),
                 ("PORT".to_string(), "3007".to_string()),
+                ("NEXT_PUBLIC_API_BASE_URL".to_string(), String::new()),
+                ("PRAXIS_API_BASE_URL".to_string(), String::new()),
                 (
                     "FILE_STORAGE_ROOT".to_string(),
                     file_storage_root.to_string_lossy().to_string(),
