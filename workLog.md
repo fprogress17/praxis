@@ -4,6 +4,17 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 
 ---
 
+## 2026-04-22 — Add explicit HTTP API slice for notes, links, and files
+
+**Time:** 21:14 EDT  
+**Commit:** `2f37fea`  
+**What:** Extracted note, workspace-note, link, and file persistence into shared server helpers; added API routes for `notes`, `workspace-notes`, `links`, and `files`; extended `/api/files/[id]` to handle file update/delete alongside file reads; and switched the right-panel notes, links, file upload/delete, and markdown save flows from server actions to HTTP calls. Re-ran `npm run typecheck`, `npm run lint`, `npm run build`, and `npm run smoke:local`.  
+**Cause:** After channels and videos were API-backed, the right panel was the largest remaining runtime surface still coupled directly to Next server actions, which would block a clean frontend/backend split.  
+**Fix / outcome:** The full right-panel CRUD path now goes through explicit API routes while preserving the current local-Postgres and local-file-storage behavior.  
+**Agent:** Codex
+
+---
+
 ## 2026-04-22 — Add explicit HTTP API slice for videos and script versions
 
 **Time:** 21:07 EDT  
