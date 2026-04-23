@@ -4,6 +4,17 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 
 ---
 
+## 2026-04-22 — Remove remaining client-side Next server-action imports
+
+**Time:** 21:17 EDT  
+**Commit:** `0951a5a`  
+**What:** Added shared idea/workspace-idea helpers plus API routes, switched the idea UI flows to HTTP calls, and verified there are no remaining `@/app/actions/*` imports in `components`, `app`, or `lib`. Re-ran `npm run typecheck`, `npm run lint`, `npm run build`, and `npm run smoke:local`.  
+**Cause:** The app had already been mostly converted to explicit route handlers, but idea creation/edit/delete still depended on client-side imports of Next server actions.  
+**Fix / outcome:** The live UI now talks only to API routes, which completes the client-side runtime cutover and leaves `app/actions` as compatibility wrappers rather than active frontend dependencies.  
+**Agent:** Codex
+
+---
+
 ## 2026-04-22 — Add explicit HTTP API slice for notes, links, and files
 
 **Time:** 21:14 EDT  
