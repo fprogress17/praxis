@@ -15,10 +15,10 @@ Goal: **speed and low friction**. Stack can change when something else is faster
 | **Backend** | **Local Postgres** | Current runtime uses `pg` via a shared server data layer and `DATABASE_URL`. |
 | **File storage** | **Local disk** | Current default is `local-storage/praxis-files` or `FILE_STORAGE_ROOT` if set. |
 | **Rich text** | **Lexical** | See [EDITOR.md](./EDITOR.md). |
-| **Desktop shell (early)** | **Tauri dev shell** | `src-tauri/` now wraps the packaged-style local runtime in development mode; packaging is not the target yet. |
+| **Desktop shell (early)** | **Tauri dev shell** | `src-tauri/` now wraps the packaged-style local runtime in development mode, with the native-managed path as the default shell behavior. |
 | **Desktop runtime contract** | **Managed local backend + Next prod server** | `desktop:runtime:*` scripts now define the packaged-style local startup path. |
 | **Native runtime manager (prep)** | **Rust process orchestration** | `src-tauri/src/runtime.rs` can own backend/frontend startup for future packaged startup without leaving all process knowledge in shell scripts. |
-| **Native shell opt-in** | **`desktop:dev:native`** | Explicitly exercises the Rust-side runtime manager while preserving the script-managed shell as rollback. |
+| **Native shell default** | **`desktop:dev` / `desktop:dev:native`** | The default desktop shell now exercises the Rust-side runtime manager, while `desktop:dev:scripted` preserves the script-managed rollback path. |
 | **Hosting (typical)** | **Local-first** | Current setup is local runtime and local database; hosting can be revisited later. |
 
 ---

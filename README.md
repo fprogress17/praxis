@@ -70,7 +70,7 @@ npm run smoke:desktop-runtime
 npm run desktop:dev
 ```
 
-This now targets the packaged-style local runtime:
+This now targets the packaged-style local runtime through the native Rust runtime manager:
 
 - backend on `127.0.0.1:4001`
 - production Next frontend on `127.0.0.1:3007`
@@ -82,13 +82,19 @@ Legacy split-runtime shell remains available:
 npm run desktop:dev:split
 ```
 
-Native-managed shell path for packaging prep:
+Script-managed packaged-runtime fallback remains available too:
+
+```bash
+npm run desktop:dev:scripted
+```
+
+Native-managed shell path is also available explicitly:
 
 ```bash
 npm run desktop:dev:native
 ```
 
-That path still uses the same `3007` runtime target, but lets the Rust app start the backend/frontend itself via `PRAXIS_DESKTOP_MANAGED_RUNTIME=1` instead of relying on the outer shell script.
+Both `desktop:dev` and `desktop:dev:native` use the Rust runtime manager via `PRAXIS_DESKTOP_MANAGED_RUNTIME=1`. `desktop:dev:scripted` keeps the older outer-shell-managed runtime as rollback.
 
 Packaging prep inside the Tauri app itself now exists too: `src-tauri/src/runtime.rs` contains a native-managed runtime scaffold behind `PRAXIS_DESKTOP_MANAGED_RUNTIME=1`, so packaged startup no longer has to begin as shell-script-only logic.
 

@@ -18,7 +18,7 @@ npm run desktop:dev
 Current limitations:
 
 - `tauri build` is not the target yet
-- startup is still orchestrated by outer shell scripts, not bundled as a packaged sidecar
+- startup is still partially development-oriented and not bundled as a packaged sidecar
 - the split-runtime shell is still separate and available as `npm run desktop:dev:split`
 
 Packaged-runtime contract now exists separately:
@@ -33,7 +33,7 @@ That contract starts:
 - backend on `127.0.0.1:4001`
 - production Next frontend on `127.0.0.1:3007`
 
-The default desktop dev shell now targets that managed runtime instead of Next dev mode.
+The default desktop dev shell now targets that managed runtime through the Rust app itself instead of shell-side startup.
 
 Native runtime management scaffold:
 
@@ -47,4 +47,10 @@ Try the native-managed path directly:
 npm run desktop:dev:native
 ```
 
-That path builds the app first, then relies on the Rust runtime manager instead of shell-side `start-desktop-runtime.sh`.
+That path is now the same architecture as the default `npm run desktop:dev`.
+
+Shell-managed rollback path:
+
+```bash
+npm run desktop:dev:scripted
+```
