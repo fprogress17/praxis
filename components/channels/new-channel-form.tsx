@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { apiUrl } from "@/lib/api/url";
 import { CHANNEL_CATEGORIES } from "@/lib/channel-categories";
 
 export function NewChannelForm({ onCancel }: { onCancel: () => void }) {
@@ -17,7 +18,7 @@ export function NewChannelForm({ onCancel }: { onCancel: () => void }) {
 
     setPending(true);
     try {
-      const response = await fetch("/api/channels", {
+      const response = await fetch(apiUrl("/api/channels"), {
         method: "POST",
         body: fd,
       });

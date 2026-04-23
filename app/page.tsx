@@ -1,4 +1,5 @@
 import { PraxisShell } from "@/components/praxis-shell";
+import { serverApiBaseUrl, serverApiUrl } from "@/lib/api/url";
 import { dbConfigured } from "@/lib/server/db";
 import {
   getWorkspaceSnapshot,
@@ -8,7 +9,8 @@ import {
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const dataConfigured = dbConfigured();
+  const apiBaseUrl = serverApiBaseUrl();
+  const dataConfigured = Boolean(apiBaseUrl) || dbConfigured();
   let channels: WorkspaceSnapshot["channels"] = [];
   let videos: WorkspaceSnapshot["videos"] = [];
   let notes: WorkspaceSnapshot["notes"] = [];
@@ -20,16 +22,36 @@ export default async function HomePage() {
 
   if (dataConfigured) {
     try {
-      ({
-        channels,
-        videos,
-        notes,
-        files,
-        links,
-        ideas,
-        workspaceIdeas,
-        workspaceNotes,
-      } = await getWorkspaceSnapshot());
+      if (apiBaseUrl) {
+        const response = await fetch(serverApiUrl("/api/bootstrap"), { cache: "no-store" });
+        const result = (await response.json()) as
+          | ({ ok: true } & WorkspaceSnapshot)
+          | { ok: false };
+        if (!response.ok || !result.ok) {
+          throw new Error("Could not load bootstrap snapshot.");
+        }
+        ({
+          channels,
+          videos,
+          notes,
+          files,
+          links,
+          ideas,
+          workspaceIdeas,
+          workspaceNotes,
+        } = result);
+      } else {
+        ({
+          channels,
+          videos,
+          notes,
+          files,
+          links,
+          ideas,
+          workspaceIdeas,
+          workspaceNotes,
+        } = await getWorkspaceSnapshot());
+      }
     } catch {
       channels = [];
       videos = [];

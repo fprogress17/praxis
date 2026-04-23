@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { apiUrl } from "@/lib/api/url";
 
 export function NewWorkspaceIdeaForm({ onCancel }: { onCancel: () => void }) {
   const router = useRouter();
@@ -15,7 +16,7 @@ export function NewWorkspaceIdeaForm({ onCancel }: { onCancel: () => void }) {
 
     setPending(true);
     try {
-      const response = await fetch("/api/workspace-ideas", {
+      const response = await fetch(apiUrl("/api/workspace-ideas"), {
         method: "POST",
         headers: {
           "content-type": "application/json",

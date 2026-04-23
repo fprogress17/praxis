@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
+import { apiUrl } from "@/lib/api/url";
 import { ChannelsPanelRail } from "@/components/layout/channels-panel-rail";
 import { CenterPanel } from "@/components/layout/center-panel";
 import { MobileChannelsCollapsedBar } from "@/components/layout/mobile-channels-collapsed-bar";
@@ -94,7 +95,7 @@ export function PraxisShell({
 
   function handleReorderChannels(newIds: string[]) {
     setOrderedIds(newIds);
-    fetch("/api/channels/order", {
+    fetch(apiUrl("/api/channels/order"), {
       method: "PATCH",
       headers: {
         "content-type": "application/json",

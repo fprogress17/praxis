@@ -73,6 +73,36 @@ type Route = {
   handler: RouteHandler;
 };
 
+function allowedOrigins() {
+  const raw = process.env.PRAXIS_ALLOWED_ORIGINS?.trim();
+  if (!raw) {
+    return new Set([
+      "http://localhost:3000",
+      "http://127.0.0.1:3000",
+      "http://localhost:3002",
+      "http://127.0.0.1:3002",
+    ]);
+  }
+
+  return new Set(
+    raw
+      .split(",")
+      .map((value) => value.trim())
+      .filter(Boolean),
+  );
+}
+
+function corsHeaders(origin: string | null) {
+  if (!origin) return {} as Record<string, string>;
+  if (!allowedOrigins().has(origin)) return {} as Record<string, string>;
+  return {
+    "access-control-allow-origin": origin,
+    "access-control-allow-methods": "GET,POST,PATCH,DELETE,OPTIONS",
+    "access-control-allow-headers": "content-type",
+    vary: "origin",
+  } satisfies Record<string, string>;
+}
+
 function parseEnv(text: string) {
   const values: Record<string, string> = {};
   for (const rawLine of text.split(/\r?\n/)) {
@@ -569,6 +599,7 @@ const routes: Route[] = [
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url ?? "/", `http://${req.headers.host ?? `${host}:${port}`}`);
   const method = req.method ?? "GET";
+  const origin = typeof req.headers.origin === "string" ? req.headers.origin : null;
 
   if (method === "OPTIONS") {
     await sendWebResponse(
@@ -577,6 +608,7 @@ const server = http.createServer(async (req, res) => {
         status: 204,
         headers: {
           allow: "GET,POST,PATCH,DELETE,OPTIONS",
+          ...corsHeaders(origin),
         },
       }),
     );
@@ -591,13 +623,17 @@ const server = http.createServer(async (req, res) => {
 
   try {
     const response = await match.handler({ req, url, params: match.params });
-    await sendWebResponse(res, response);
+    const headers = new Headers(response.headers);
+    for (const [key, value] of Object.entries(corsHeaders(origin))) {
+      headers.set(key, value);
+    }
+    await sendWebResponse(res, new Response(response.body, { status: response.status, headers }));
   } catch (error) {
     await sendWebResponse(
       res,
       json(
         { ok: false, error: error instanceof Error ? error.message : "Internal server error." },
-        { status: 500 },
+        { status: 500, headers: corsHeaders(origin) },
       ),
     );
   }

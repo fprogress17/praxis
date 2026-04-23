@@ -11,6 +11,13 @@ Run:
 npm run backend:dev
 ```
 
+Optional frontend target:
+
+```bash
+NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:4001
+PRAXIS_API_BASE_URL=http://127.0.0.1:4001
+```
+
 Env:
 - Reads `.env.local` automatically if present
 - Requires `DATABASE_URL`

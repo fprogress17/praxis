@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { apiUrl } from "@/lib/api/url";
 
 export function NewIdeaForm({
   channelId,
@@ -23,7 +24,7 @@ export function NewIdeaForm({
 
     setPending(true);
     try {
-      const response = await fetch("/api/ideas", {
+      const response = await fetch(apiUrl("/api/ideas"), {
         method: "POST",
         headers: {
           "content-type": "application/json",

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { apiUrl } from "@/lib/api/url";
 import { VideoEpisodeStatusRow } from "@/components/videos/video-episode-status-row";
 import { defaultEpisodeForNewVideo } from "@/lib/episode";
 import type { VideoRow } from "@/lib/types/video";
@@ -37,7 +38,7 @@ export function EditVideoForm({
   useEffect(() => {
     let cancelled = false;
     void (async () => {
-      const response = await fetch(`/api/videos/${video.id}/script-versions`, {
+      const response = await fetch(apiUrl(`/api/videos/${video.id}/script-versions`), {
         cache: "no-store",
       });
       const result = (await response.json()) as {
@@ -80,7 +81,7 @@ export function EditVideoForm({
 
     setPending(true);
     try {
-      const response = await fetch(`/api/videos/${video.id}`, {
+      const response = await fetch(apiUrl(`/api/videos/${video.id}`), {
         method: "PATCH",
         body: fd,
       });
@@ -101,7 +102,7 @@ export function EditVideoForm({
     setSavingVersion(scriptType);
     try {
       const body = scriptType === "script" ? scriptValue : ttsScriptValue;
-      const response = await fetch(`/api/videos/${video.id}/script-versions`, {
+      const response = await fetch(apiUrl(`/api/videos/${video.id}/script-versions`), {
         method: "POST",
         headers: {
           "content-type": "application/json",

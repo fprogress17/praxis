@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { apiUrl } from "@/lib/api/url";
 import type { NoteRow } from "@/lib/types/note";
 import type { WorkspaceNoteRow } from "@/lib/types/workspace-note";
 
@@ -77,7 +78,9 @@ export function NotesSection(props: NotesSectionProps) {
     setDeletingId(noteId);
     try {
       const response = await fetch(
-        props.scope === "workspace" ? `/api/workspace-notes/${noteId}` : `/api/notes/${noteId}`,
+        apiUrl(
+          props.scope === "workspace" ? `/api/workspace-notes/${noteId}` : `/api/notes/${noteId}`,
+        ),
         { method: "DELETE" },
       );
       const result = (await response.json()) as { ok: boolean; error?: string };
@@ -102,7 +105,7 @@ export function NotesSection(props: NotesSectionProps) {
     try {
       if (props.scope === "workspace") {
         const response = await fetch(
-          draft.id ? `/api/workspace-notes/${draft.id}` : "/api/workspace-notes",
+          apiUrl(draft.id ? `/api/workspace-notes/${draft.id}` : "/api/workspace-notes"),
           {
             method: draft.id ? "PATCH" : "POST",
             headers: { "content-type": "application/json" },
@@ -119,7 +122,7 @@ export function NotesSection(props: NotesSectionProps) {
         }
       } else {
         if (!props.channelId) return;
-        const response = await fetch(draft.id ? `/api/notes/${draft.id}` : "/api/notes", {
+        const response = await fetch(apiUrl(draft.id ? `/api/notes/${draft.id}` : "/api/notes"), {
           method: draft.id ? "PATCH" : "POST",
           headers: { "content-type": "application/json" },
           body: JSON.stringify(

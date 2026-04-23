@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Pencil, Trash2 } from "lucide-react";
+import { apiUrl } from "@/lib/api/url";
 import type { WorkspaceIdeaRow } from "@/lib/types/workspace-idea";
 
 function formatDate(iso: string) {
@@ -47,7 +48,7 @@ export function WorkspaceIdeaSidebarList({
     setError(null);
     setPending(true);
     try {
-      const response = await fetch(`/api/workspace-ideas/${editingId}`, {
+      const response = await fetch(apiUrl(`/api/workspace-ideas/${editingId}`), {
         method: "PATCH",
         headers: {
           "content-type": "application/json",
@@ -71,7 +72,7 @@ export function WorkspaceIdeaSidebarList({
     setError(null);
     setDeletingId(ideaId);
     try {
-      const response = await fetch(`/api/workspace-ideas/${ideaId}`, { method: "DELETE" });
+      const response = await fetch(apiUrl(`/api/workspace-ideas/${ideaId}`), { method: "DELETE" });
       const result = (await response.json()) as { ok: boolean; error?: string };
       if (!result.ok) {
         setError(result.error ?? "Could not delete workspace idea.");

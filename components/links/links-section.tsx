@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { ExternalLink, Pencil, Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { apiUrl } from "@/lib/api/url";
 import type { LinkRow } from "@/lib/types/link";
 
 type LinksSectionProps = {
@@ -85,7 +86,7 @@ export function LinksSection({
     setError(null);
     setPending(true);
     try {
-      const response = await fetch(draft.id ? `/api/links/${draft.id}` : "/api/links", {
+      const response = await fetch(apiUrl(draft.id ? `/api/links/${draft.id}` : "/api/links"), {
         method: draft.id ? "PATCH" : "POST",
         headers: {
           "content-type": "application/json",
@@ -119,7 +120,7 @@ export function LinksSection({
     setError(null);
     setDeletingId(link.id);
     try {
-      const response = await fetch(`/api/links/${link.id}`, { method: "DELETE" });
+      const response = await fetch(apiUrl(`/api/links/${link.id}`), { method: "DELETE" });
       const result = (await response.json()) as { ok: boolean; error?: string };
       if (!result.ok) {
         setError(result.error ?? "Could not delete link.");

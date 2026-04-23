@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { apiUrl } from "@/lib/api/url";
 import { defaultEpisodeForNewVideo } from "@/lib/episode";
 import { VideoEpisodeStatusRow } from "@/components/videos/video-episode-status-row";
 
@@ -42,7 +43,7 @@ export function NewVideoForm({
 
     setPending(true);
     try {
-      const response = await fetch("/api/videos", {
+      const response = await fetch(apiUrl("/api/videos"), {
         method: "POST",
         body: fd,
       });

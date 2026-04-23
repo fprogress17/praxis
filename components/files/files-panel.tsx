@@ -14,6 +14,7 @@ import {
   Upload,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { apiUrl } from "@/lib/api/url";
 import type { FileRow } from "@/lib/types/file";
 
 type FilesPanelProps = {
@@ -256,7 +257,9 @@ export function FilesPanel({
       return;
     }
 
-    setImageUrls(Object.fromEntries(imageFiles.map((file) => [file.id, `/api/files/${file.id}`])));
+    setImageUrls(
+      Object.fromEntries(imageFiles.map((file) => [file.id, apiUrl(`/api/files/${file.id}`)])),
+    );
   }, [imageFiles]);
 
   useEffect(() => {
@@ -277,7 +280,9 @@ export function FilesPanel({
       const kind = previewKind(selected);
       if (kind === "text") {
         try {
-          const response = await fetch(`/api/files/${selected.id}`, { cache: "no-store" });
+          const response = await fetch(apiUrl(`/api/files/${selected.id}`), {
+            cache: "no-store",
+          });
           if (!response.ok) throw new Error("Could not load this file.");
           const text = await response.text();
           if (!cancelled) {
@@ -296,7 +301,7 @@ export function FilesPanel({
       }
 
       if (!cancelled) {
-        setPreview({ status: "object", url: `/api/files/${selected.id}`, kind });
+        setPreview({ status: "object", url: apiUrl(`/api/files/${selected.id}`), kind });
       }
     }
 
@@ -406,7 +411,7 @@ export function FilesPanel({
       if (scope === "video" && videoId) fd.set("video_id", videoId);
       for (const file of picked) fd.append("files", file);
 
-      const response = await fetch("/api/files", {
+      const response = await fetch(apiUrl("/api/files"), {
         method: "POST",
         body: fd,
       });
@@ -442,7 +447,7 @@ export function FilesPanel({
     setDeletingId(file.id);
     try {
       const result = (await (
-        await fetch(`/api/files/${file.id}`, { method: "DELETE" })
+        await fetch(apiUrl(`/api/files/${file.id}`), { method: "DELETE" })
       ).json()) as { ok: boolean; error?: string };
       if (!result.ok) {
         setError(result.error ?? "Could not delete file.");
@@ -460,7 +465,7 @@ export function FilesPanel({
     setError(null);
     setSavingEdit(true);
     try {
-      const response = await fetch(`/api/files/${selected.id}`, {
+      const response = await fetch(apiUrl(`/api/files/${selected.id}`), {
         method: "PATCH",
         headers: {
           "content-type": "application/json",

@@ -4,6 +4,7 @@ import { createPortal } from "react-dom";
 import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 import { Loader2, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { apiUrl } from "@/lib/api/url";
 import type { VideoRow } from "@/lib/types/video";
 import { statusDotClass } from "@/lib/video-status";
 
@@ -268,7 +269,7 @@ export function ChannelVideoList({
     setError(null);
     setDeletingId(video.id);
     try {
-      const response = await fetch(`/api/videos/${video.id}`, {
+      const response = await fetch(apiUrl(`/api/videos/${video.id}`), {
         method: "DELETE",
       });
       const result = (await response.json()) as { ok: boolean; error?: string };
