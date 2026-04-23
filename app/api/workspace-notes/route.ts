@@ -1,24 +1,5 @@
-import { revalidatePath } from "next/cache";
-import { NextResponse } from "next/server";
-import { proxyApiRequest } from "@/lib/server/api-proxy";
-import { dbConfigured } from "@/lib/server/db";
-import { createWorkspaceNoteRecord, parseWorkspaceNoteFormData } from "@/lib/server/notes";
+import { handleNextApiRequest } from "@/lib/server/next-api";
 
 export async function POST(request: Request) {
-  const proxied = await proxyApiRequest(request, "/api/workspace-notes");
-  if (proxied) return proxied;
-
-  if (!dbConfigured()) {
-    return NextResponse.json({ ok: false, error: "DATABASE_URL is not configured." }, { status: 500 });
-  }
-
-  const body = (await request.json()) as { title?: string; body?: string };
-  const formData = new FormData();
-  formData.set("title", body.title ?? "");
-  formData.set("body", body.body ?? "");
-
-  const result = await createWorkspaceNoteRecord(parseWorkspaceNoteFormData(formData));
-  if (!result.ok) return NextResponse.json(result, { status: 400 });
-  revalidatePath("/");
-  return NextResponse.json(result);
+  return handleNextApiRequest(request, { pathname: "/api/workspace-notes", revalidate: true });
 }

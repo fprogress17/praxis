@@ -1,27 +1,5 @@
-import { revalidatePath } from "next/cache";
-import { NextResponse } from "next/server";
-import { proxyApiRequest } from "@/lib/server/api-proxy";
-import { dbConfigured } from "@/lib/server/db";
-import { createIdeaRecord, parseIdeaFormData } from "@/lib/server/ideas";
+import { handleNextApiRequest } from "@/lib/server/next-api";
 
 export async function POST(request: Request) {
-  const proxied = await proxyApiRequest(request, "/api/ideas");
-  if (proxied) return proxied;
-
-  if (!dbConfigured()) {
-    return NextResponse.json(
-      { ok: false, error: "DATABASE_URL is not configured." },
-      { status: 500 },
-    );
-  }
-
-  const body = (await request.json()) as { channelId?: string; body?: string };
-  const formData = new FormData();
-  formData.set("channel_id", body.channelId ?? "");
-  formData.set("body", body.body ?? "");
-
-  const result = await createIdeaRecord(parseIdeaFormData(formData));
-  if (!result.ok) return NextResponse.json(result, { status: 400 });
-  revalidatePath("/");
-  return NextResponse.json(result);
+  return handleNextApiRequest(request, { pathname: "/api/ideas", revalidate: true });
 }
