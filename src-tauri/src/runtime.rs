@@ -172,7 +172,7 @@ impl ManagedRuntimeConfig {
             backend_program: "node".to_string(),
             backend_args: Vec::new(),
             backend_env_overrides: Vec::new(),
-            frontend_program: "node".to_string(),
+            frontend_program: node_program_path(),
             frontend_args: vec!["server.js".to_string()],
             frontend_env_overrides: vec![
                 ("HOSTNAME".to_string(), "127.0.0.1".to_string()),
@@ -221,6 +221,23 @@ fn bundled_next_dir() -> Result<PathBuf, String> {
         ));
     }
     Ok(bundled_dir)
+}
+
+fn node_program_path() -> String {
+    if let Ok(path) = std::env::var("PRAXIS_DESKTOP_NODE_PATH") {
+        let trimmed = path.trim();
+        if !trimmed.is_empty() {
+            return trimmed.to_string();
+        }
+    }
+
+    for candidate in ["/opt/homebrew/bin/node", "/usr/local/bin/node", "/usr/bin/node"] {
+        if Path::new(candidate).exists() {
+            return candidate.to_string();
+        }
+    }
+
+    "node".to_string()
 }
 
 fn split_args(raw: &str) -> Vec<String> {
