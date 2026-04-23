@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
-import { updateChannelPositions } from "@/app/actions/channels";
 import { ChannelsPanelRail } from "@/components/layout/channels-panel-rail";
 import { CenterPanel } from "@/components/layout/center-panel";
 import { MobileChannelsCollapsedBar } from "@/components/layout/mobile-channels-collapsed-bar";
@@ -95,7 +94,13 @@ export function PraxisShell({
 
   function handleReorderChannels(newIds: string[]) {
     setOrderedIds(newIds);
-    updateChannelPositions(newIds).catch(console.error);
+    fetch("/api/channels/order", {
+      method: "PATCH",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({ orderedIds: newIds }),
+    }).catch(console.error);
   }
 
   const channelVideos = useMemo(() => {

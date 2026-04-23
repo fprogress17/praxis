@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createChannel } from "@/app/actions/channels";
 import { CHANNEL_CATEGORIES } from "@/lib/channel-categories";
 
 export function NewChannelForm({ onCancel }: { onCancel: () => void }) {
@@ -18,9 +17,13 @@ export function NewChannelForm({ onCancel }: { onCancel: () => void }) {
 
     setPending(true);
     try {
-      const result = await createChannel(fd);
+      const response = await fetch("/api/channels", {
+        method: "POST",
+        body: fd,
+      });
+      const result = (await response.json()) as { ok: boolean; error?: string };
       if (!result.ok) {
-        setError(result.error);
+        setError(result.error ?? "Could not create channel.");
         return;
       }
       form.reset();
