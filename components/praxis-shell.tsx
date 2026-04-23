@@ -411,6 +411,7 @@ export function PraxisShell({
           onSelectChannel={selectChannel}
           onAddVideo={openAddVideo}
           onAddIdea={openAddIdea}
+          onReorderChannels={handleReorderChannels}
           dataConfigured={dataConfigured}
         />
       )}

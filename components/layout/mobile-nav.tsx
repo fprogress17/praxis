@@ -1,6 +1,23 @@
 "use client";
 
-import { ChevronDown, CirclePlus, Lightbulb } from "lucide-react";
+import { ChevronDown, CirclePlus, GripVertical, Lightbulb } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  KeyboardSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+  arrayMove,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { ChannelCard } from "@/components/channels/channel-card";
 import { WorkspaceIdeaSidebarList } from "@/components/ideas/workspace-idea-sidebar-list";
 import type { ChannelRow } from "@/lib/types/channel";
@@ -18,6 +35,7 @@ export function MobileNav({
   onSelectChannel,
   onAddVideo,
   onAddIdea,
+  onReorderChannels,
   dataConfigured,
 }: {
   channels: ChannelRow[];
@@ -29,8 +47,22 @@ export function MobileNav({
   onSelectChannel: (id: string) => void;
   onAddVideo: (channelId: string) => void;
   onAddIdea: (channelId: string) => void;
+  onReorderChannels: (newIds: string[]) => void;
   dataConfigured: boolean;
 }) {
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = channels.findIndex((c) => c.id === active.id);
+    const newIndex = channels.findIndex((c) => c.id === over.id);
+    onReorderChannels(arrayMove(channels, oldIndex, newIndex).map((c) => c.id));
+  }
+
   return (
     <header className="sticky top-0 z-20 shrink-0 border-b border-border bg-paper lg:hidden">
       <div className="flex items-center justify-between gap-2 px-4 py-3">
@@ -80,18 +112,29 @@ export function MobileNav({
           {channels.length === 0 ? (
             <p className="py-2 text-meta text-muted">No channels yet — tap New channel.</p>
           ) : (
-            <div className="space-y-3 pt-1">
-              {channels.map((ch) => (
-                <ChannelCard
-                  key={ch.id}
-                  channel={ch}
-                  active={ch.id === selectedId}
-                  onSelect={onSelectChannel}
-                  onAddVideo={onAddVideo}
-                  onAddIdea={onAddIdea}
-                />
-              ))}
-            </div>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={channels.map((channel) => channel.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="space-y-3 pt-1">
+                  {channels.map((ch) => (
+                    <SortableMobileChannelCard
+                      key={ch.id}
+                      channel={ch}
+                      selectedId={selectedId}
+                      onSelectChannel={onSelectChannel}
+                      onAddVideo={onAddVideo}
+                      onAddIdea={onAddIdea}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
           )}
           {dataConfigured ? (
             <div className="border-t border-border">
@@ -101,5 +144,52 @@ export function MobileNav({
         </div>
       </details>
     </header>
+  );
+}
+
+function SortableMobileChannelCard({
+  channel,
+  selectedId,
+  onSelectChannel,
+  onAddVideo,
+  onAddIdea,
+}: {
+  channel: ChannelRow;
+  selectedId: string | null;
+  onSelectChannel: (id: string) => void;
+  onAddVideo: (channelId: string) => void;
+  onAddIdea: (channelId: string) => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: channel.id,
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition,
+      }}
+      className={`relative ${isDragging ? "z-50 opacity-50" : ""}`}
+    >
+      <button
+        type="button"
+        {...listeners}
+        {...attributes}
+        tabIndex={-1}
+        aria-label="Drag to reorder"
+        className="absolute right-2 top-2.5 z-10 touch-none p-1 text-muted/30 transition-colors hover:text-muted active:cursor-grabbing"
+      >
+        <GripVertical className="h-4 w-4" strokeWidth={1.75} />
+      </button>
+      <ChannelCard
+        channel={channel}
+        active={channel.id === selectedId}
+        onSelect={onSelectChannel}
+        onAddVideo={onAddVideo}
+        onAddIdea={onAddIdea}
+      />
+    </div>
   );
 }
