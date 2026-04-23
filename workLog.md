@@ -4,6 +4,17 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 
 ---
 
+## 2026-04-22 — Proxy Next API routes to standalone backend in split mode
+
+**Time:** 21:43 EDT  
+**Commit:** `c81d0c4`  
+**What:** Added a shared server-side API proxy helper, updated the Next `app/api/*` route handlers to forward to `PRAXIS_API_BASE_URL` when configured, and broadened default standalone-backend CORS handling to allow localhost/127.0.0.1 dev origins on arbitrary ports. Re-ran `npm run typecheck`, `npm run lint`, `npm run build`, and `npm run smoke:local`, then live-verified a split frontend on `3004` where `http://127.0.0.1:3004/api/bootstrap` returned real data through the standalone backend and the backend emitted the expected CORS headers for `http://localhost:3004`.  
+**Cause:** The frontend could already target the standalone backend directly, but the Next route handlers still owned backend logic locally, which kept the split runtime from shrinking toward a true frontend-only Next app.  
+**Fix / outcome:** In split mode, Next route handlers now delegate to the standalone backend instead of touching local DB/storage logic first, while fallback behavior remains available when no backend base URL is set.  
+**Agent:** Codex
+
+---
+
 ## 2026-04-22 — Verify split runtime with standalone backend and frontend
 
 **Time:** 21:31 EDT  
