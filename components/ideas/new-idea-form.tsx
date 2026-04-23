@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createIdea } from "@/app/actions/ideas";
 
 export function NewIdeaForm({
   channelId,
@@ -21,13 +20,22 @@ export function NewIdeaForm({
     e.preventDefault();
     setError(null);
     const form = e.currentTarget;
-    const fd = new FormData(form);
 
     setPending(true);
     try {
-      const result = await createIdea(fd);
+      const response = await fetch("/api/ideas", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          channelId,
+          body: String(new FormData(form).get("body") ?? ""),
+        }),
+      });
+      const result = (await response.json()) as { ok: boolean; error?: string };
       if (!result.ok) {
-        setError(result.error);
+        setError(result.error ?? "Could not create idea.");
         return;
       }
       form.reset();

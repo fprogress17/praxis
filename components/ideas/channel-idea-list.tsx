@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Pencil, Trash2 } from "lucide-react";
-import { deleteIdea, updateIdea } from "@/app/actions/ideas";
 import type { IdeaRow } from "@/lib/types/idea";
 
 function formatDate(iso: string) {
@@ -43,14 +42,18 @@ export function ChannelIdeaList({ ideas }: { ideas: IdeaRow[] }) {
     e.preventDefault();
     if (!editingId) return;
     setError(null);
-    const fd = new FormData();
-    fd.set("idea_id", editingId);
-    fd.set("body", draft.trim());
     setPending(true);
     try {
-      const result = await updateIdea(fd);
+      const response = await fetch(`/api/ideas/${editingId}`, {
+        method: "PATCH",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({ body: draft.trim() }),
+      });
+      const result = (await response.json()) as { ok: boolean; error?: string };
       if (!result.ok) {
-        setError(result.error);
+        setError(result.error ?? "Could not save idea.");
         return;
       }
       cancelEdit();
@@ -65,13 +68,12 @@ export function ChannelIdeaList({ ideas }: { ideas: IdeaRow[] }) {
       return;
     }
     setError(null);
-    const fd = new FormData();
-    fd.set("idea_id", ideaId);
     setDeletingId(ideaId);
     try {
-      const result = await deleteIdea(fd);
+      const response = await fetch(`/api/ideas/${ideaId}`, { method: "DELETE" });
+      const result = (await response.json()) as { ok: boolean; error?: string };
       if (!result.ok) {
-        setError(result.error);
+        setError(result.error ?? "Could not delete idea.");
         return;
       }
       if (editingId === ideaId) {

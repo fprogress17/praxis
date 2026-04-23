@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createWorkspaceIdea } from "@/app/actions/workspace-ideas";
 
 export function NewWorkspaceIdeaForm({ onCancel }: { onCancel: () => void }) {
   const router = useRouter();
@@ -13,13 +12,21 @@ export function NewWorkspaceIdeaForm({ onCancel }: { onCancel: () => void }) {
     e.preventDefault();
     setError(null);
     const form = e.currentTarget;
-    const fd = new FormData(form);
 
     setPending(true);
     try {
-      const result = await createWorkspaceIdea(fd);
+      const response = await fetch("/api/workspace-ideas", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          body: String(new FormData(form).get("body") ?? ""),
+        }),
+      });
+      const result = (await response.json()) as { ok: boolean; error?: string };
       if (!result.ok) {
-        setError(result.error);
+        setError(result.error ?? "Could not create workspace idea.");
         return;
       }
       form.reset();
