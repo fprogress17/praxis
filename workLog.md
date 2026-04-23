@@ -7,7 +7,7 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 ## 2026-04-23 — Verify native-managed desktop shell path
 
 **Time:** 07:45 EDT  
-**Commit:** `(pending)`  
+**Commit:** `581f8b5`  
 **What:** Added `npm run desktop:dev:native` via `scripts/dev-tauri-native-managed.sh`, which builds the app, opts into `PRAXIS_DESKTOP_MANAGED_RUNTIME=1`, disables Tauri’s dev-server wait deadlock, and launches the shell against `src-tauri/tauri.runtime-dev.conf.json`. Re-ran `npm run typecheck`, `npm run lint`, `cargo test`, and the real native-managed shell path, then confirmed the Rust app itself started backend `4001` and frontend `3007` and that both were gone after exit.  
 **Cause:** The Rust-side runtime manager existed, but it had not yet been exercised end-to-end as the actual owner of local runtime startup.  
 **Fix / outcome:** Praxis now has a verified native-managed desktop shell path that proves the Tauri app can start and stop the local backend/frontend itself, which is the key packaging transition away from shell-script-only orchestration.  
