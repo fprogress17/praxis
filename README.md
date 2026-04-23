@@ -82,6 +82,8 @@ Legacy split-runtime shell remains available:
 npm run desktop:dev:split
 ```
 
+Packaging prep inside the Tauri app itself now exists too: `src-tauri/src/runtime.rs` contains a native-managed runtime scaffold behind `PRAXIS_DESKTOP_MANAGED_RUNTIME=1`, so packaged startup no longer has to begin as shell-script-only logic.
+
 ## Next step
 
 Keep **UI** and **data** boundaries clean so a **Tauri** shell can wrap the same app later. See [STACK.md](./STACK.md) and [LOCAL_POSTGRES_MIGRATION.md](./LOCAL_POSTGRES_MIGRATION.md).

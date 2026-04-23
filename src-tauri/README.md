@@ -34,3 +34,9 @@ That contract starts:
 - production Next frontend on `127.0.0.1:3007`
 
 The default desktop dev shell now targets that managed runtime instead of Next dev mode.
+
+Native runtime management scaffold:
+
+- `src-tauri/src/runtime.rs` now contains app-side process orchestration for backend/frontend startup and shutdown
+- it is gated behind `PRAXIS_DESKTOP_MANAGED_RUNTIME=1`
+- this is preparation for packaged startup, not the default dev-shell path yet

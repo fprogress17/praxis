@@ -4,6 +4,17 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 
 ---
 
+## 2026-04-23 — Add native Tauri runtime-manager scaffold
+
+**Time:** 07:41 EDT  
+**Commit:** `(pending)`  
+**What:** Added `src-tauri/src/runtime.rs` with a native-managed runtime scaffold for backend/frontend process startup, health checks, `.env.local` loading, and shutdown; wired it into `src-tauri/src/lib.rs`; added unit tests for the runtime helpers; and documented the new packaging-oriented env contract in the root README, stack doc, `.env.example`, and `src-tauri/README.md`. Re-ran `cargo check`, `cargo test`, and `npm run smoke:desktop-runtime`.  
+**Cause:** The desktop runtime and shell were already working through shell scripts, but the next packaging step needed runtime knowledge to start moving into the Tauri app itself instead of staying entirely in bash.  
+**Fix / outcome:** Praxis now has a clean Rust-side runtime manager scaffold behind `PRAXIS_DESKTOP_MANAGED_RUNTIME=1`, which is the first native packaging building block for eventually starting the local runtime from inside the desktop shell.  
+**Agent:** Codex
+
+---
+
 ## 2026-04-23 — Switch default desktop shell to packaged-style runtime
 
 **Time:** 07:35 EDT  

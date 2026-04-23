@@ -17,6 +17,7 @@ Goal: **speed and low friction**. Stack can change when something else is faster
 | **Rich text** | **Lexical** | See [EDITOR.md](./EDITOR.md). |
 | **Desktop shell (early)** | **Tauri dev shell** | `src-tauri/` now wraps the packaged-style local runtime in development mode; packaging is not the target yet. |
 | **Desktop runtime contract** | **Managed local backend + Next prod server** | `desktop:runtime:*` scripts now define the packaged-style local startup path. |
+| **Native runtime manager (prep)** | **Rust process orchestration** | `src-tauri/src/runtime.rs` can own backend/frontend startup for future packaged startup without leaving all process knowledge in shell scripts. |
 | **Hosting (typical)** | **Local-first** | Current setup is local runtime and local database; hosting can be revisited later. |
 
 ---
