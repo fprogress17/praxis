@@ -7,7 +7,7 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 ## 2026-04-23 — Add standalone-backend lifecycle orchestration
 
 **Time:** 07:13 EDT  
-**Commit:** `(pending)`  
+**Commit:** `3a6451d`  
 **What:** Added shared backend env/runtime defaults plus managed `backend:start`, `backend:status`, `backend:stop`, `backend:restart`, and `smoke:backend` scripts; updated split-frontend startup to reuse the same backend URL contract; and documented the new orchestration flow in the root/backend READMEs and `.env.example`. Re-ran `npm run typecheck`, `npm run lint`, `npm run build`, `npm run smoke:local`, and a real `npm run smoke:backend` lifecycle check.  
 **Cause:** The standalone backend existed, but desktop-oriented startup was still just “run the server manually,” which left no deterministic contract for launch, health checking, PID/log handling, or clean shutdown.  
 **Fix / outcome:** Praxis now has an explicit backend process orchestration layer that a future Tauri shell can call directly, with consistent host/port/runtime state and a verified managed lifecycle.  
