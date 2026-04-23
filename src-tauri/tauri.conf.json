@@ -1,0 +1,30 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Praxis",
+  "version": "0.1.0",
+  "identifier": "com.praxis.desktop",
+  "build": {
+    "beforeDevCommand": "npm run dev:split -- 3006",
+    "devUrl": "http://127.0.0.1:3006",
+    "frontendDist": "../app"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "Praxis",
+        "width": 1440,
+        "height": 960,
+        "minWidth": 1100,
+        "minHeight": 760
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": false,
+    "icon": []
+  }
+}

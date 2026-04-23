@@ -47,6 +47,14 @@ npm run backend:status
 npm run backend:stop
 ```
 
+## Desktop Shell Dev
+
+```bash
+npm run desktop:dev
+```
+
+This is an early Tauri development shell. It starts the managed backend, launches the split frontend on `127.0.0.1:3006`, and opens a native desktop window. Packaging is intentionally deferred.
+
 ## Next step
 
 Keep **UI** and **data** boundaries clean so a **Tauri** shell can wrap the same app later. See [STACK.md](./STACK.md) and [LOCAL_POSTGRES_MIGRATION.md](./LOCAL_POSTGRES_MIGRATION.md).

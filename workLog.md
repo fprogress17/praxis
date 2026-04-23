@@ -4,6 +4,17 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 
 ---
 
+## 2026-04-23 — Add first Tauri desktop-shell scaffold
+
+**Time:** 07:20 EDT  
+**Commit:** `(pending)`  
+**What:** Added a first `src-tauri/` scaffold, a `desktop:dev` runner, and a minimal Tauri config that targets the split frontend on `127.0.0.1:3006` while relying on the managed backend lifecycle scripts. Also added the required Tauri CLI dependency, placeholder icon asset, and shell-specific docs in the root README, stack doc, and `src-tauri/README.md`. Re-ran `npm run typecheck`, `npm run lint`, `npm run build`, `npm run smoke:local`, `npm run smoke:backend`, and `cargo check` in `src-tauri/`.  
+**Cause:** The standalone backend and lifecycle orchestration were in place, so the next safe step was to prove Praxis could be wrapped in a native shell without changing the existing browser-first runtime.  
+**Fix / outcome:** Praxis now has an early Tauri development shell checkpoint that compiles locally and is structurally ready for the next phase: real shell launch verification and sidecar-aware desktop packaging.  
+**Agent:** Codex
+
+---
+
 ## 2026-04-23 — Add standalone-backend lifecycle orchestration
 
 **Time:** 07:13 EDT  
