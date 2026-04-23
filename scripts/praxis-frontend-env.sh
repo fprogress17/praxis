@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# shellcheck disable=SC1091
+source "$ROOT_DIR/scripts/praxis-backend-env.sh"
+
+export PRAXIS_FRONTEND_HOST="${PRAXIS_FRONTEND_HOST:-127.0.0.1}"
+export PRAXIS_FRONTEND_PORT="${PRAXIS_FRONTEND_PORT:-3007}"
+
+CLIENT_HOST="${PRAXIS_FRONTEND_CLIENT_HOST:-$PRAXIS_FRONTEND_HOST}"
+if [[ "$CLIENT_HOST" == "0.0.0.0" ]]; then
+  CLIENT_HOST="127.0.0.1"
+fi
+export PRAXIS_FRONTEND_CLIENT_HOST="$CLIENT_HOST"
+export PRAXIS_FRONTEND_URL="http://${PRAXIS_FRONTEND_CLIENT_HOST}:${PRAXIS_FRONTEND_PORT}"
+
+export PRAXIS_FRONTEND_PID_FILE="${PRAXIS_FRONTEND_PID_FILE:-$PRAXIS_RUNTIME_DIR/praxis-frontend.pid}"
+export PRAXIS_FRONTEND_LOG_FILE="${PRAXIS_FRONTEND_LOG_FILE:-$PRAXIS_RUNTIME_DIR/praxis-frontend.log}"

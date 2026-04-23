@@ -4,6 +4,17 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 
 ---
 
+## 2026-04-23 — Add packaged-style desktop runtime contract
+
+**Time:** 07:31 EDT  
+**Commit:** `(pending)`  
+**What:** Added managed production-style frontend lifecycle scripts (`frontend:start|stop|status|restart`), combined desktop-runtime lifecycle scripts (`desktop:runtime:start|stop|status`), and a real `smoke:desktop-runtime` check that builds the app, starts backend plus Next production server, verifies both local endpoints, and shuts everything down cleanly. Also documented the new runtime contract in the root README, stack doc, `.env.example`, and `src-tauri/README.md`, and excluded `src-tauri/target` from ESLint noise.  
+**Cause:** The Tauri dev shell was working, but packaging-oriented work still lacked a concrete local runtime contract for “backend + production frontend” outside Next dev mode.  
+**Fix / outcome:** Praxis now has a verified packaged-style local runtime path that a future desktop shell can target directly, which reduces the next packaging step to shell integration instead of process design.  
+**Agent:** Codex
+
+---
+
 ## 2026-04-23 — Verify desktop shell launch and fix dev integration issues
 
 **Time:** 07:27 EDT  

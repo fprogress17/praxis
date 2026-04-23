@@ -16,6 +16,7 @@ Goal: **speed and low friction**. Stack can change when something else is faster
 | **File storage** | **Local disk** | Current default is `local-storage/praxis-files` or `FILE_STORAGE_ROOT` if set. |
 | **Rich text** | **Lexical** | See [EDITOR.md](./EDITOR.md). |
 | **Desktop shell (early)** | **Tauri dev shell** | `src-tauri/` now wraps the split runtime in development mode; packaging is not the target yet. |
+| **Desktop runtime contract** | **Managed local backend + Next prod server** | `desktop:runtime:*` scripts now define the packaged-style local startup path. |
 | **Hosting (typical)** | **Local-first** | Current setup is local runtime and local database; hosting can be revisited later. |
 
 ---

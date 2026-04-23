@@ -47,6 +47,23 @@ npm run backend:status
 npm run backend:stop
 ```
 
+## Desktop Runtime Contract
+
+Production-style local runtime for a future packaged shell:
+
+```bash
+npm run build
+npm run desktop:runtime:start
+npm run desktop:runtime:status
+npm run desktop:runtime:stop
+```
+
+Smoke check:
+
+```bash
+npm run smoke:desktop-runtime
+```
+
 ## Desktop Shell Dev
 
 ```bash
