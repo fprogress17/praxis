@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { CirclePlus, GripVertical, Lightbulb } from "lucide-react";
 import {
   DndContext,
@@ -23,6 +24,7 @@ import { WorkspaceIdeaSidebarList } from "@/components/ideas/workspace-idea-side
 import type { ChannelRow } from "@/lib/types/channel";
 import type { WorkspaceIdeaRow } from "@/lib/types/workspace-idea";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Settings2 } from "lucide-react";
 
 export function Sidebar({
   channels,
@@ -65,7 +67,7 @@ export function Sidebar({
   return (
     <aside className="hidden w-[260px] shrink-0 border-r border-border bg-paper lg:flex lg:flex-col">
       <div className="border-b border-border px-4 py-4">
-        <div className="mb-3">
+        <div className="mb-3 flex items-start justify-between gap-3">
           <button
             type="button"
             onClick={onGoHome}
@@ -74,6 +76,13 @@ export function Sidebar({
             <div className="font-serif text-h4 text-foreground">Praxis</div>
             <div className="text-body text-muted">YouTube channel creation workspace</div>
           </button>
+          <Link
+            href="/settings"
+            aria-label="Open settings"
+            className="inline-flex shrink-0 items-center justify-center rounded-lg border border-border bg-surface p-2 text-muted shadow-soft transition-colors hover:bg-black/4 hover:text-foreground dark:hover:bg-white/5"
+          >
+            <Settings2 className="h-4 w-4" strokeWidth={1.75} />
+          </Link>
         </div>
 
         <div className="grid grid-cols-2 gap-1.5">

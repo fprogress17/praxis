@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { ChevronDown, CirclePlus, GripVertical, Lightbulb } from "lucide-react";
 import {
   DndContext,
@@ -23,6 +24,7 @@ import { WorkspaceIdeaSidebarList } from "@/components/ideas/workspace-idea-side
 import type { ChannelRow } from "@/lib/types/channel";
 import type { WorkspaceIdeaRow } from "@/lib/types/workspace-idea";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Settings2 } from "lucide-react";
 
 /** Visible below `lg` — desktop sidebar is hidden there, so this carries New channel + channel list. */
 export function MobileNav({
@@ -96,6 +98,13 @@ export function MobileNav({
               Idea
             </button>
           </div>
+          <Link
+            href="/settings"
+            aria-label="Open settings"
+            className="inline-flex items-center justify-center rounded-lg border border-border bg-surface p-2 text-muted shadow-soft"
+          >
+            <Settings2 className="h-4 w-4" strokeWidth={1.75} />
+          </Link>
           <ThemeToggle compact />
         </div>
       </div>

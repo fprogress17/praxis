@@ -19,6 +19,7 @@ const appSupportDir = path.join(
   "Application Support",
   "com.praxis.desktop",
 );
+const settingsTarget = path.join(appSupportDir, "desktop-settings.txt");
 const envSource = path.join(root, ".env.local");
 const envTarget = path.join(appSupportDir, ".env.local");
 const storageSource = path.join(root, "local-storage", "praxis-files");
@@ -41,6 +42,10 @@ await fs.rm(applicationsApp, { recursive: true, force: true });
 await fs.cp(builtApp, applicationsApp, { recursive: true });
 
 await fs.mkdir(appSupportDir, { recursive: true });
+
+if (!(await exists(settingsTarget))) {
+  await fs.writeFile(settingsTarget, "share_on_local_network=1\n", "utf8");
+}
 
 if (await exists(envSource)) {
   const envText = await fs.readFile(envSource, "utf8");

@@ -12,6 +12,7 @@ use std::{
 
 const DEFAULT_BACKEND_URL: &str = "http://127.0.0.1:4001/health";
 const DEFAULT_FRONTEND_URL: &str = "http://127.0.0.1:3007/";
+const DESKTOP_SETTINGS_FILE: &str = "desktop-settings.txt";
 
 #[derive(Default)]
 pub struct ManagedRuntime {
@@ -103,6 +104,15 @@ impl ManagedRuntimeConfig {
         let runtime_dir = std::env::var("PRAXIS_RUNTIME_DIR")
             .map(PathBuf::from)
             .unwrap_or_else(|_| workdir.join(".runtime"));
+        let settings_path = std::env::var("PRAXIS_DESKTOP_SETTINGS_PATH")
+            .map(PathBuf::from)
+            .unwrap_or_else(|_| runtime_dir.join(DESKTOP_SETTINGS_FILE));
+        let share_on_local_network = read_share_on_local_network(&settings_path);
+        let bind_host = if share_on_local_network {
+            "0.0.0.0"
+        } else {
+            "127.0.0.1"
+        };
 
         fs::create_dir_all(&runtime_dir).map_err(|error| error.to_string())?;
 
@@ -124,7 +134,7 @@ impl ManagedRuntimeConfig {
                 }),
             ),
             backend_env_overrides: vec![
-                ("PRAXIS_BACKEND_HOST".to_string(), "127.0.0.1".to_string()),
+                ("PRAXIS_BACKEND_HOST".to_string(), bind_host.to_string()),
                 ("PRAXIS_BACKEND_PORT".to_string(), "4001".to_string()),
                 (
                     "PRAXIS_BACKEND_CLIENT_HOST".to_string(),
@@ -135,7 +145,7 @@ impl ManagedRuntimeConfig {
                 .unwrap_or_else(|_| "npx".to_string()),
             frontend_args: split_args(
                 &std::env::var("PRAXIS_DESKTOP_FRONTEND_ARGS").unwrap_or_else(|_| {
-                    "next|start|--hostname|127.0.0.1|--port|3007".to_string()
+                    format!("next|start|--hostname|{}|--port|3007", bind_host)
                 }),
             ),
             frontend_env_overrides: vec![
@@ -147,6 +157,10 @@ impl ManagedRuntimeConfig {
                     "PRAXIS_API_BASE_URL".to_string(),
                     "http://127.0.0.1:4001".to_string(),
                 ),
+                (
+                    "PRAXIS_DESKTOP_SETTINGS_PATH".to_string(),
+                    settings_path.to_string_lossy().to_string(),
+                ),
             ],
             workdir,
         })
@@ -156,6 +170,13 @@ impl ManagedRuntimeConfig {
         let app_support_dir = app_support_dir()?;
         let runtime_dir = app_support_dir.join("runtime");
         let file_storage_root = app_support_dir.join("files");
+        let settings_path = app_support_dir.join(DESKTOP_SETTINGS_FILE);
+        let share_on_local_network = read_share_on_local_network(&settings_path);
+        let bind_host = if share_on_local_network {
+            "0.0.0.0"
+        } else {
+            "127.0.0.1"
+        };
         let workdir = bundled_next_dir()?;
 
         fs::create_dir_all(&runtime_dir).map_err(|error| error.to_string())?;
@@ -175,10 +196,14 @@ impl ManagedRuntimeConfig {
             frontend_program: node_program_path(),
             frontend_args: vec!["server.js".to_string()],
             frontend_env_overrides: vec![
-                ("HOSTNAME".to_string(), "127.0.0.1".to_string()),
+                ("HOSTNAME".to_string(), bind_host.to_string()),
                 ("PORT".to_string(), "3007".to_string()),
                 ("NEXT_PUBLIC_API_BASE_URL".to_string(), String::new()),
                 ("PRAXIS_API_BASE_URL".to_string(), String::new()),
+                (
+                    "PRAXIS_DESKTOP_SETTINGS_PATH".to_string(),
+                    settings_path.to_string_lossy().to_string(),
+                ),
                 (
                     "FILE_STORAGE_ROOT".to_string(),
                     file_storage_root.to_string_lossy().to_string(),
@@ -240,6 +265,24 @@ fn node_program_path() -> String {
     }
 
     "node".to_string()
+}
+
+fn read_share_on_local_network(path: &Path) -> bool {
+    let Ok(text) = fs::read_to_string(path) else {
+        return true;
+    };
+
+    for raw_line in text.lines() {
+        let line = raw_line.trim();
+        let Some(value) = line.strip_prefix("share_on_local_network=") else {
+            continue;
+        };
+
+        let normalized = value.trim().to_ascii_lowercase();
+        return matches!(normalized.as_str(), "1" | "true" | "yes" | "on");
+    }
+
+    true
 }
 
 fn split_args(raw: &str) -> Vec<String> {
