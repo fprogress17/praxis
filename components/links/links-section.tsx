@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { ExternalLink, Pencil, Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { createLink, deleteLink, updateLink } from "@/app/actions/links";
 import type { LinkRow } from "@/lib/types/link";
 
 type LinksSectionProps = {
@@ -83,20 +82,29 @@ export function LinksSection({
     e.preventDefault();
     if (!draft) return;
 
-    const fd = new FormData();
-    if (draft.id) fd.set("id", draft.id);
-    if (channelId) fd.set("channel_id", channelId);
-    if (scope === "video" && videoId) fd.set("video_id", videoId);
-    fd.set("title", draft.title);
-    fd.set("url", draft.url);
-    fd.set("note", draft.note);
-
     setError(null);
     setPending(true);
     try {
-      const result = draft.id ? await updateLink(fd) : await createLink(fd);
+      const response = await fetch(draft.id ? `/api/links/${draft.id}` : "/api/links", {
+        method: draft.id ? "PATCH" : "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(
+          draft.id
+            ? { title: draft.title, url: draft.url, note: draft.note }
+            : {
+                channelId,
+                videoId: scope === "video" ? videoId : null,
+                title: draft.title,
+                url: draft.url,
+                note: draft.note,
+              },
+        ),
+      });
+      const result = (await response.json()) as { ok: boolean; error?: string };
       if (!result.ok) {
-        setError(result.error);
+        setError(result.error ?? "Could not save link.");
         return;
       }
       setDraft(null);
@@ -108,14 +116,13 @@ export function LinksSection({
 
   async function onDelete(link: LinkRow) {
     if (!confirm(`Delete ${displayTitle(link)}?`)) return;
-    const fd = new FormData();
-    fd.set("id", link.id);
     setError(null);
     setDeletingId(link.id);
     try {
-      const result = await deleteLink(fd);
+      const response = await fetch(`/api/links/${link.id}`, { method: "DELETE" });
+      const result = (await response.json()) as { ok: boolean; error?: string };
       if (!result.ok) {
-        setError(result.error);
+        setError(result.error ?? "Could not delete link.");
         return;
       }
       if (draft?.id === link.id) setDraft(null);

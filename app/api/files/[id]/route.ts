@@ -1,14 +1,11 @@
 import path from "node:path";
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
-import { query } from "@/lib/server/db";
-import { readStorageObject } from "@/lib/server/storage";
-
-type FileRecord = {
-  id: string;
-  name: string;
-  mime_type: string;
-  object_path: string;
-};
+import {
+  deleteStoredFile,
+  readStoredFile,
+  updateStoredFileContent,
+} from "@/lib/server/files";
 
 function contentDisposition(fileName: string, asAttachment: boolean) {
   const mode = asAttachment ? "attachment" : "inline";
@@ -16,38 +13,58 @@ function contentDisposition(fileName: string, asAttachment: boolean) {
 }
 
 export async function GET(
+  request: Request,
+  context: { params: Promise<{ id: string }> },
+) {
+  const { id } = await context.params;
+  const { searchParams } = new URL(request.url);
+  const download = searchParams.get("download") === "1";
+  const result = await readStoredFile(id);
+  if (!result.ok) {
+    return NextResponse.json({ error: result.error }, { status: 404 });
+  }
+
+  const ext = path.extname(result.file.name).toLowerCase();
+  const type =
+    result.file.mime_type ||
+    (ext === ".md" ? "text/markdown; charset=utf-8" : "application/octet-stream");
+
+  return new NextResponse(result.bytes, {
+    headers: {
+      "content-type": type,
+      "content-disposition": contentDisposition(result.file.name, download),
+      "cache-control": "no-store",
+    },
+  });
+}
+
+export async function PATCH(
+  request: Request,
+  context: { params: Promise<{ id: string }> },
+) {
+  const { id } = await context.params;
+  const body = (await request.json()) as { content?: string; mimeType?: string };
+  const result = await updateStoredFileContent({
+    id,
+    content: body.content ?? "",
+    mimeType: body.mimeType ?? "",
+  });
+  if (!result.ok) {
+    return NextResponse.json(result, { status: 400 });
+  }
+  revalidatePath("/");
+  return NextResponse.json(result);
+}
+
+export async function DELETE(
   _request: Request,
   context: { params: Promise<{ id: string }> },
 ) {
   const { id } = await context.params;
-  const { searchParams } = new URL(_request.url);
-  const download = searchParams.get("download") === "1";
-
-  const result = await query<FileRecord>(
-    `select id, name, mime_type, object_path from public.files where id = $1 limit 1`,
-    [id],
-  );
-
-  const file = result.rows[0];
-  if (!file) {
-    return NextResponse.json({ error: "File not found." }, { status: 404 });
+  const result = await deleteStoredFile(id);
+  if (!result.ok) {
+    return NextResponse.json(result, { status: 400 });
   }
-
-  try {
-    const bytes = await readStorageObject(file.object_path);
-    const ext = path.extname(file.name).toLowerCase();
-    const type =
-      file.mime_type ||
-      (ext === ".md" ? "text/markdown; charset=utf-8" : "application/octet-stream");
-
-    return new NextResponse(bytes, {
-      headers: {
-        "content-type": type,
-        "content-disposition": contentDisposition(file.name, download),
-        "cache-control": "no-store",
-      },
-    });
-  } catch {
-    return NextResponse.json({ error: "File content is missing on disk." }, { status: 404 });
-  }
+  revalidatePath("/");
+  return NextResponse.json(result);
 }

@@ -14,11 +14,6 @@ import {
   Upload,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import {
-  deleteFileRecord,
-  updateFileContent,
-  uploadFiles as uploadFilesAction,
-} from "@/app/actions/files";
 import type { FileRow } from "@/lib/types/file";
 
 type FilesPanelProps = {
@@ -411,9 +406,13 @@ export function FilesPanel({
       if (scope === "video" && videoId) fd.set("video_id", videoId);
       for (const file of picked) fd.append("files", file);
 
-      const result = await uploadFilesAction(fd);
+      const response = await fetch("/api/files", {
+        method: "POST",
+        body: fd,
+      });
+      const result = (await response.json()) as { ok: boolean; error?: string };
       if (!result.ok) {
-        setError(result.error);
+        setError(result.error ?? "Could not upload files.");
         return;
       }
 
@@ -442,12 +441,11 @@ export function FilesPanel({
     setError(null);
     setDeletingId(file.id);
     try {
-      const fd = new FormData();
-      fd.set("id", file.id);
-      fd.set("object_path", file.object_path);
-      const result = await deleteFileRecord(fd);
+      const result = (await (
+        await fetch(`/api/files/${file.id}`, { method: "DELETE" })
+      ).json()) as { ok: boolean; error?: string };
       if (!result.ok) {
-        setError(result.error);
+        setError(result.error ?? "Could not delete file.");
         return;
       }
       router.refresh();
@@ -462,13 +460,19 @@ export function FilesPanel({
     setError(null);
     setSavingEdit(true);
     try {
-      const fd = new FormData();
-      fd.set("id", selected.id);
-      fd.set("content", editDraft);
-      fd.set("mime_type", selected.mime_type || "text/markdown");
-      const result = await updateFileContent(fd);
+      const response = await fetch(`/api/files/${selected.id}`, {
+        method: "PATCH",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          content: editDraft,
+          mimeType: selected.mime_type || "text/markdown",
+        }),
+      });
+      const result = (await response.json()) as { ok: boolean; error?: string };
       if (!result.ok) {
-        setError(result.error);
+        setError(result.error ?? "Could not save file.");
         return;
       }
       setPreview({ status: "text", text: editDraft });

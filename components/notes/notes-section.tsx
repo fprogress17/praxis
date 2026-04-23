@@ -3,12 +3,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { createNote, deleteNote, updateNote } from "@/app/actions/notes";
-import {
-  createWorkspaceNote,
-  deleteWorkspaceNote,
-  updateWorkspaceNote,
-} from "@/app/actions/workspace-notes";
 import type { NoteRow } from "@/lib/types/note";
 import type { WorkspaceNoteRow } from "@/lib/types/workspace-note";
 
@@ -80,16 +74,15 @@ export function NotesSection(props: NotesSectionProps) {
   async function handleDelete(noteId: string) {
     if (!confirm("Delete this note?")) return;
     setError(null);
-    const fd = new FormData();
-    fd.set("id", noteId);
     setDeletingId(noteId);
     try {
-      const result =
-        props.scope === "workspace"
-          ? await deleteWorkspaceNote(fd)
-          : await deleteNote(fd);
+      const response = await fetch(
+        props.scope === "workspace" ? `/api/workspace-notes/${noteId}` : `/api/notes/${noteId}`,
+        { method: "DELETE" },
+      );
+      const result = (await response.json()) as { ok: boolean; error?: string };
       if (!result.ok) {
-        setError(result.error);
+        setError(result.error ?? "Could not delete note.");
         return;
       }
       if (draft?.id === noteId) {
@@ -108,55 +101,44 @@ export function NotesSection(props: NotesSectionProps) {
     setPending(true);
     try {
       if (props.scope === "workspace") {
-        const result = draft.id
-          ? await updateWorkspaceNote(
-              (() => {
-                const fd = new FormData();
-                fd.set("id", draft.id!);
-                fd.set("title", draft.title.trim());
-                fd.set("body", draft.body);
-                return fd;
-              })(),
-            )
-          : await createWorkspaceNote(
-              (() => {
-                const fd = new FormData();
-                fd.set("title", draft.title.trim());
-                fd.set("body", draft.body);
-                return fd;
-              })(),
-            );
+        const response = await fetch(
+          draft.id ? `/api/workspace-notes/${draft.id}` : "/api/workspace-notes",
+          {
+            method: draft.id ? "PATCH" : "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({
+              title: draft.title.trim(),
+              body: draft.body,
+            }),
+          },
+        );
+        const result = (await response.json()) as { ok: boolean; error?: string };
         if (!result.ok) {
-          setError(result.error);
+          setError(result.error ?? "Could not save note.");
           return;
         }
       } else {
         if (!props.channelId) return;
-        const cid = props.channelId;
-        const result = draft.id
-          ? await updateNote(
-              (() => {
-                const fd = new FormData();
-                fd.set("id", draft.id!);
-                fd.set("title", draft.title.trim());
-                fd.set("body", draft.body);
-                return fd;
-              })(),
-            )
-          : await createNote(
-              (() => {
-                const fd = new FormData();
-                fd.set("channel_id", cid);
-                fd.set("title", draft.title.trim());
-                fd.set("body", draft.body);
-                if (props.videoId) {
-                  fd.set("video_id", props.videoId);
+        const response = await fetch(draft.id ? `/api/notes/${draft.id}` : "/api/notes", {
+          method: draft.id ? "PATCH" : "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(
+            draft.id
+              ? {
+                  title: draft.title.trim(),
+                  body: draft.body,
                 }
-                return fd;
-              })(),
-            );
+              : {
+                  channelId: props.channelId,
+                  videoId: props.videoId,
+                  title: draft.title.trim(),
+                  body: draft.body,
+                },
+          ),
+        });
+        const result = (await response.json()) as { ok: boolean; error?: string };
         if (!result.ok) {
-          setError(result.error);
+          setError(result.error ?? "Could not save note.");
           return;
         }
       }
