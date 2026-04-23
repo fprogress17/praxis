@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createVideo } from "@/app/actions/videos";
 import { defaultEpisodeForNewVideo } from "@/lib/episode";
 import { VideoEpisodeStatusRow } from "@/components/videos/video-episode-status-row";
 
@@ -43,9 +42,13 @@ export function NewVideoForm({
 
     setPending(true);
     try {
-      const result = await createVideo(fd);
+      const response = await fetch("/api/videos", {
+        method: "POST",
+        body: fd,
+      });
+      const result = (await response.json()) as { ok: boolean; error?: string };
       if (!result.ok) {
-        setError(result.error);
+        setError(result.error ?? "Could not create video.");
         return;
       }
       form.reset();

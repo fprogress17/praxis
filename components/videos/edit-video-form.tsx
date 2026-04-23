@@ -2,8 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { updateVideo } from "@/app/actions/videos";
-import { listScriptVersions, saveScriptVersion } from "@/app/actions/script-versions";
 import { VideoEpisodeStatusRow } from "@/components/videos/video-episode-status-row";
 import { defaultEpisodeForNewVideo } from "@/lib/episode";
 import type { VideoRow } from "@/lib/types/video";
@@ -38,9 +36,18 @@ export function EditVideoForm({
   // Fetch existing versions for this video on mount.
   useEffect(() => {
     let cancelled = false;
-    void listScriptVersions(video.id).then((data) => {
-      if (!cancelled) setVersions(data);
-    });
+    void (async () => {
+      const response = await fetch(`/api/videos/${video.id}/script-versions`, {
+        cache: "no-store",
+      });
+      const result = (await response.json()) as {
+        ok: boolean;
+        versions?: ScriptVersionRow[];
+      };
+      if (!cancelled && result.ok) {
+        setVersions(result.versions ?? []);
+      }
+    })();
     return () => {
       cancelled = true;
     };
@@ -73,9 +80,13 @@ export function EditVideoForm({
 
     setPending(true);
     try {
-      const result = await updateVideo(fd);
+      const response = await fetch(`/api/videos/${video.id}`, {
+        method: "PATCH",
+        body: fd,
+      });
+      const result = (await response.json()) as { ok: boolean; error?: string };
       if (!result.ok) {
-        setError(result.error);
+        setError(result.error ?? "Could not update video.");
         return;
       }
       onDone();
@@ -90,14 +101,30 @@ export function EditVideoForm({
     setSavingVersion(scriptType);
     try {
       const body = scriptType === "script" ? scriptValue : ttsScriptValue;
-      const result = await saveScriptVersion(video.id, scriptType, body);
+      const response = await fetch(`/api/videos/${video.id}/script-versions`, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({ scriptType, body }),
+      });
+      const result = (await response.json()) as {
+        ok: boolean;
+        error?: string;
+        version?: ScriptVersionRow;
+      };
       if (!result.ok) {
-        setVersionError(result.error);
+        setVersionError(result.error ?? "Could not save script version.");
         return;
       }
-      setVersions((prev) => [...prev, result.version]);
-      if (scriptType === "script") setLoadedScriptVersion(result.version.version_number);
-      else setLoadedTtsVersion(result.version.version_number);
+      if (!result.version) {
+        setVersionError("Script version response was incomplete.");
+        return;
+      }
+      const version = result.version;
+      setVersions((prev) => [...prev, version]);
+      if (scriptType === "script") setLoadedScriptVersion(version.version_number);
+      else setLoadedTtsVersion(version.version_number);
     } finally {
       setSavingVersion(null);
     }
