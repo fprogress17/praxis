@@ -7,7 +7,7 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 ## 2026-04-23 — Add mobile drag-and-drop channel reordering
 
 **Time:** 08:05 EDT  
-**Commit:** `(pending)`  
+**Commit:** `33f39ed`  
 **What:** Added `@dnd-kit`-based drag-and-drop reordering to the mobile channel list in `components/layout/mobile-nav.tsx`, with a mobile drag handle and the same `/api/channels/order` persistence path already used by the desktop sidebar. Wired `MobileNav` into the existing `handleReorderChannels` flow from `components/praxis-shell.tsx`, then re-ran `npm run typecheck`, `npm run lint`, and `npm run build`.  
 **Cause:** Desktop already supported drag-and-drop channel reordering, but the narrow/mobile channel list from the top nav still rendered as a static stack of cards with no reorder affordance.  
 **Fix / outcome:** Channel ordering behavior is now consistent across desktop and mobile views while reusing the existing reorder API and state path instead of introducing a separate implementation.  
