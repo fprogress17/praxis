@@ -4,6 +4,17 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 
 ---
 
+## 2026-04-22 — Verify split runtime with standalone backend and frontend
+
+**Time:** 21:31 EDT  
+**Commit:** `899572b`  
+**What:** Added `npm run dev:split` via `scripts/dev-split-frontend.sh`, documented the split-runtime flow in the root and backend READMEs, updated local `.env.local` on this machine to target `http://127.0.0.1:4001`, and live-verified the separated runtime with backend on `4001` plus frontend on `3003`. Re-ran `npm run typecheck`, `npm run lint`, `npm run build`, and `npm run smoke:local`, then confirmed `HTTP 200` from `http://127.0.0.1:3003/` and rendered app data under the split setup.  
+**Cause:** The optional backend-target support existed, but local development still needed a repeatable way to launch the frontend against the standalone backend and prove the split runtime actually worked end to end.  
+**Fix / outcome:** Praxis now has a reproducible split-dev path, and the frontend has been verified against the standalone backend without disturbing the rollback path.  
+**Agent:** Codex
+
+---
+
 ## 2026-04-22 — Add optional frontend target for standalone backend
 
 **Time:** 21:31 EDT  
