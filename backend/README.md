@@ -11,6 +11,12 @@ Run:
 npm run backend:dev
 ```
 
+Split frontend against this backend:
+
+```bash
+npm run dev:split -- 3003
+```
+
 Optional frontend target:
 
 ```bash

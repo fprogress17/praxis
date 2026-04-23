@@ -6,6 +6,7 @@
     "clean": "rm -rf .next",
     "dev": "next dev",
     "backend:dev": "node --experimental-strip-types --loader ./backend/alias-loader.mjs backend/server.ts",
+    "dev:split": "bash scripts/dev-split-frontend.sh",
     "dev:turbo": "next dev --turbopack",
     "dev:clean": "npm run clean && next dev",
     "build": "next build",

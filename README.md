@@ -31,6 +31,15 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
+## Split Runtime Dev
+
+```bash
+npm run backend:dev
+npm run dev:split -- 3003
+```
+
+Open [http://localhost:3003](http://localhost:3003).
+
 ## Next step
 
 Keep **UI** and **data** boundaries clean so a **Tauri** shell can wrap the same app later. See [STACK.md](./STACK.md) and [LOCAL_POSTGRES_MIGRATION.md](./LOCAL_POSTGRES_MIGRATION.md).
