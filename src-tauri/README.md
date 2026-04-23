@@ -21,10 +21,16 @@ Build a macOS app bundle:
 npm run desktop:build
 ```
 
+Install the built app plus local desktop support files:
+
+```bash
+npm run desktop:install
+```
+
 Current limitations:
 
 - the packaged `.app` still depends on this repo’s local backend/frontend files and `node_modules`
-- startup is still a local-runtime handoff, not a fully self-contained bundled sidecar
+- startup is still a local-runtime handoff, but release builds now bundle a standalone Next server instead of calling back into the repo checkout
 - the split-runtime shell is still separate and available as `npm run desktop:dev:split`
 
 Packaged-runtime contract now exists separately:
@@ -48,6 +54,7 @@ Native runtime management scaffold:
 - desktop icon assets now come from `src-tauri/icons/icon.svg` plus generated bundle icons
 - it is enabled by `PRAXIS_DESKTOP_MANAGED_RUNTIME=1` in dev and by default in packaged release builds
 - the packaged app uses a tiny bundled launcher page that hands off to the local frontend on `127.0.0.1:3007`
+- `npm run desktop:install` syncs the current `.env.local` and `local-storage/praxis-files` into `~/Library/Application Support/com.praxis.desktop/`
 
 Try the native-managed path directly:
 

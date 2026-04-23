@@ -25,14 +25,17 @@ pub type SharedRuntime = Arc<Mutex<ManagedRuntime>>;
 struct ManagedRuntimeConfig {
     workdir: PathBuf,
     env_file: PathBuf,
-    backend_health_url: String,
     frontend_health_url: String,
+    backend_enabled: bool,
+    backend_health_url: String,
     backend_log_file: PathBuf,
     frontend_log_file: PathBuf,
     backend_program: String,
     backend_args: Vec<String>,
+    backend_env_overrides: Vec<(String, String)>,
     frontend_program: String,
     frontend_args: Vec<String>,
+    frontend_env_overrides: Vec<(String, String)>,
 }
 
 impl ManagedRuntime {
@@ -51,18 +54,14 @@ impl ManagedRuntime {
             .lock()
             .map_err(|_| "Managed runtime lock poisoned.".to_string())?;
 
-        if !http_ok(&config.backend_health_url) {
+        if config.backend_enabled && !http_ok(&config.backend_health_url) {
             state.backend = Some(spawn_process(
                 &config.workdir,
                 &config.backend_log_file,
                 &config.backend_program,
                 &config.backend_args,
                 &inherited_env,
-                &[
-                    ("PRAXIS_BACKEND_HOST", "127.0.0.1"),
-                    ("PRAXIS_BACKEND_PORT", "4001"),
-                    ("PRAXIS_BACKEND_CLIENT_HOST", "127.0.0.1"),
-                ],
+                &config.backend_env_overrides,
             )?);
             wait_for_http_ok(&config.backend_health_url, "backend")?;
         }
@@ -74,10 +73,7 @@ impl ManagedRuntime {
                 &config.frontend_program,
                 &config.frontend_args,
                 &inherited_env,
-                &[
-                    ("NEXT_PUBLIC_API_BASE_URL", "http://127.0.0.1:4001"),
-                    ("PRAXIS_API_BASE_URL", "http://127.0.0.1:4001"),
-                ],
+                &config.frontend_env_overrides,
             )?);
             wait_for_http_ok(&config.frontend_health_url, "frontend")?;
         }
@@ -93,6 +89,14 @@ impl ManagedRuntime {
 
 impl ManagedRuntimeConfig {
     fn from_env() -> Result<Self, String> {
+        if cfg!(debug_assertions) {
+            return Self::dev_from_env();
+        }
+
+        Self::release_from_bundle()
+    }
+
+    fn dev_from_env() -> Result<Self, String> {
         let workdir = std::env::var("PRAXIS_DESKTOP_WORKDIR")
             .map(PathBuf::from)
             .unwrap_or_else(|_| repo_root_dir());
@@ -104,10 +108,11 @@ impl ManagedRuntimeConfig {
 
         Ok(Self {
             env_file: workdir.join(".env.local"),
-            backend_health_url: std::env::var("PRAXIS_DESKTOP_BACKEND_HEALTH_URL")
-                .unwrap_or_else(|_| DEFAULT_BACKEND_URL.to_string()),
             frontend_health_url: std::env::var("PRAXIS_DESKTOP_FRONTEND_HEALTH_URL")
                 .unwrap_or_else(|_| DEFAULT_FRONTEND_URL.to_string()),
+            backend_enabled: true,
+            backend_health_url: std::env::var("PRAXIS_DESKTOP_BACKEND_HEALTH_URL")
+                .unwrap_or_else(|_| DEFAULT_BACKEND_URL.to_string()),
             backend_log_file: runtime_dir.join("praxis-backend.native.log"),
             frontend_log_file: runtime_dir.join("praxis-frontend.native.log"),
             backend_program: std::env::var("PRAXIS_DESKTOP_BACKEND_PROGRAM")
@@ -118,6 +123,14 @@ impl ManagedRuntimeConfig {
                         .to_string()
                 }),
             ),
+            backend_env_overrides: vec![
+                ("PRAXIS_BACKEND_HOST".to_string(), "127.0.0.1".to_string()),
+                ("PRAXIS_BACKEND_PORT".to_string(), "4001".to_string()),
+                (
+                    "PRAXIS_BACKEND_CLIENT_HOST".to_string(),
+                    "127.0.0.1".to_string(),
+                ),
+            ],
             frontend_program: std::env::var("PRAXIS_DESKTOP_FRONTEND_PROGRAM")
                 .unwrap_or_else(|_| "npx".to_string()),
             frontend_args: split_args(
@@ -125,7 +138,50 @@ impl ManagedRuntimeConfig {
                     "next|start|--hostname|127.0.0.1|--port|3007".to_string()
                 }),
             ),
+            frontend_env_overrides: vec![
+                (
+                    "NEXT_PUBLIC_API_BASE_URL".to_string(),
+                    "http://127.0.0.1:4001".to_string(),
+                ),
+                (
+                    "PRAXIS_API_BASE_URL".to_string(),
+                    "http://127.0.0.1:4001".to_string(),
+                ),
+            ],
             workdir,
+        })
+    }
+
+    fn release_from_bundle() -> Result<Self, String> {
+        let app_support_dir = app_support_dir()?;
+        let runtime_dir = app_support_dir.join("runtime");
+        let file_storage_root = app_support_dir.join("files");
+        let workdir = bundled_next_dir()?;
+
+        fs::create_dir_all(&runtime_dir).map_err(|error| error.to_string())?;
+        fs::create_dir_all(&file_storage_root).map_err(|error| error.to_string())?;
+
+        Ok(Self {
+            workdir,
+            env_file: app_support_dir.join(".env.local"),
+            frontend_health_url: DEFAULT_FRONTEND_URL.to_string(),
+            backend_enabled: false,
+            backend_health_url: DEFAULT_BACKEND_URL.to_string(),
+            backend_log_file: runtime_dir.join("praxis-backend.native.log"),
+            frontend_log_file: runtime_dir.join("praxis-frontend.native.log"),
+            backend_program: "node".to_string(),
+            backend_args: Vec::new(),
+            backend_env_overrides: Vec::new(),
+            frontend_program: "node".to_string(),
+            frontend_args: vec!["server.js".to_string()],
+            frontend_env_overrides: vec![
+                ("HOSTNAME".to_string(), "127.0.0.1".to_string()),
+                ("PORT".to_string(), "3007".to_string()),
+                (
+                    "FILE_STORAGE_ROOT".to_string(),
+                    file_storage_root.to_string_lossy().to_string(),
+                ),
+            ],
         })
     }
 }
@@ -142,6 +198,31 @@ fn repo_root_dir() -> PathBuf {
         .unwrap_or_else(|| PathBuf::from("."))
 }
 
+fn app_support_dir() -> Result<PathBuf, String> {
+    let home = std::env::var("HOME").map_err(|_| "HOME is not set.".to_string())?;
+    Ok(PathBuf::from(home)
+        .join("Library")
+        .join("Application Support")
+        .join("com.praxis.desktop"))
+}
+
+fn bundled_next_dir() -> Result<PathBuf, String> {
+    let exe = std::env::current_exe().map_err(|error| error.to_string())?;
+    let resources_dir = exe
+        .parent()
+        .and_then(Path::parent)
+        .map(|path| path.join("Resources"))
+        .ok_or_else(|| "Could not locate Praxis app Resources directory.".to_string())?;
+    let bundled_dir = resources_dir.join("bundled").join("next");
+    if !bundled_dir.exists() {
+        return Err(format!(
+            "Bundled Next runtime was not found at {}",
+            bundled_dir.display()
+        ));
+    }
+    Ok(bundled_dir)
+}
+
 fn split_args(raw: &str) -> Vec<String> {
     raw.split('|')
         .map(str::trim)
@@ -156,7 +237,7 @@ fn spawn_process(
     program: &str,
     args: &[String],
     inherited_env: &HashMap<String, String>,
-    overrides: &[(&str, &str)],
+    overrides: &[(String, String)],
 ) -> Result<Child, String> {
     let log = OpenOptions::new()
         .create(true)
