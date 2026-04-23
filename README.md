@@ -70,7 +70,17 @@ npm run smoke:desktop-runtime
 npm run desktop:dev
 ```
 
-This is an early Tauri development shell. It starts the managed backend, launches the split frontend on `127.0.0.1:3006`, and opens a native desktop window. Packaging is intentionally deferred.
+This now targets the packaged-style local runtime:
+
+- backend on `127.0.0.1:4001`
+- production Next frontend on `127.0.0.1:3007`
+- native Tauri window on top
+
+Legacy split-runtime shell remains available:
+
+```bash
+npm run desktop:dev:split
+```
 
 ## Next step
 

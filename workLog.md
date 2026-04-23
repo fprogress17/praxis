@@ -4,6 +4,17 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 
 ---
 
+## 2026-04-23 — Switch default desktop shell to packaged-style runtime
+
+**Time:** 07:35 EDT  
+**Commit:** `(pending)`  
+**What:** Switched `npm run desktop:dev` to a new `scripts/dev-tauri-runtime.sh` path that builds the app, starts the managed desktop runtime (`backend` on `4001`, production Next frontend on `3007`), and then launches Tauri against `src-tauri/tauri.runtime-dev.conf.json`. Kept the old split-runtime shell available as `npm run desktop:dev:split`, and updated the root/Tauri docs plus stack notes to reflect the new default. Re-ran `npm run typecheck`, `npm run lint`, `npm run smoke:desktop-runtime`, and the real `npm run desktop:dev` shell launch/shutdown path.  
+**Cause:** The repo already had a verified packaged-style local runtime contract, so keeping the default desktop shell on top of Next dev mode no longer matched the direction of travel toward packaging.  
+**Fix / outcome:** The default Tauri shell path now exercises the same production-style local runtime that future packaging will rely on, while the older split-runtime shell remains available for debugging.  
+**Agent:** Codex
+
+---
+
 ## 2026-04-23 — Add packaged-style desktop runtime contract
 
 **Time:** 07:31 EDT  
