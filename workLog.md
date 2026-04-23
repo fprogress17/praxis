@@ -7,7 +7,7 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 ## 2026-04-23 — Add desktop window-state persistence and Tauri icon set
 
 **Time:** 12:10 EDT  
-**Commit:** `PENDING`  
+**Commit:** `4e959db`  
 **What:** Added native Tauri window-state persistence in `src-tauri/src/window_state.rs` and wired it into `src-tauri/src/lib.rs` so the desktop shell restores the last main-window size/position on relaunch while preserving maximized state from the last normal bounds. Replaced the placeholder 1x1 desktop icon with a Japanese-inspired ink-circle plus seal design via `src-tauri/icons/icon.svg`, generated the real bundle icon assets (`icon.png`, `icon.icns`, `icon.ico`, platform PNGs), updated `src-tauri/tauri.conf.json` to use them, documented the shell behavior in `src-tauri/README.md`, and re-ran `cargo check`, `cargo test`, `npm run typecheck`, `npm run lint`, `npm run build`, plus a live `npm run desktop:dev` launch.  
 **Cause:** The desktop shell had no persisted window geometry, so every relaunch reset to defaults, and the app icon was still a placeholder single-pixel asset that was not suitable for an actual Mac shell. The first live window-state pass also exposed bogus saved bounds from raw runtime values, which would have made restore behavior unsafe.  
 **Fix / outcome:** Praxis desktop now has a real icon set and a native window-state path with sanity filtering so obviously invalid bounds are ignored instead of restored. The Rust-side state logic is covered by unit tests, and the desktop shell continues to launch cleanly on the native-managed path.  
