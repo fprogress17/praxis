@@ -4,6 +4,17 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 
 ---
 
+## 2026-04-22 — Add first explicit HTTP API slice for channels and homepage snapshot
+
+**Time:** 21:00 EDT  
+**Commit:** `81f6192`  
+**What:** Extracted the homepage data load into a shared workspace snapshot service, added `GET /api/bootstrap`, `GET/POST /api/channels`, and `PATCH /api/channels/order`, and switched the client-side channel create/reorder path from server actions to explicit HTTP calls. Re-ran `npm run typecheck`, `npm run lint`, `npm run build`, and `npm run smoke:local`.  
+**Cause:** The next safe step toward a MediaLedger-style shared backend is to make the app speak API-shaped boundaries one slice at a time instead of keeping UI mutations coupled directly to Next server actions and inline page SQL.  
+**Fix / outcome:** Channels and initial workspace loading now have reusable service code plus HTTP entry points, giving the repo a concrete backend seam without disturbing the rest of the local-Postgres runtime.  
+**Agent:** Codex
+
+---
+
 ## 2026-04-22 — Commit archival source docs, extension scaffold, and legacy migrations
 
 **Time:** 16:36 EDT  
