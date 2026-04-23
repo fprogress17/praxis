@@ -17,6 +17,7 @@
     "dev:split": "bash scripts/dev-split-frontend.sh",
     "desktop:dev": "bash scripts/dev-tauri-runtime.sh",
     "desktop:dev:split": "bash scripts/dev-tauri.sh",
+    "desktop:dev:native": "bash scripts/dev-tauri-native-managed.sh",
     "desktop:runtime:start": "bash scripts/start-desktop-runtime.sh",
     "desktop:runtime:stop": "bash scripts/stop-desktop-runtime.sh",
     "desktop:runtime:status": "bash scripts/desktop-runtime-status.sh",

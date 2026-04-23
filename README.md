@@ -82,6 +82,14 @@ Legacy split-runtime shell remains available:
 npm run desktop:dev:split
 ```
 
+Native-managed shell path for packaging prep:
+
+```bash
+npm run desktop:dev:native
+```
+
+That path still uses the same `3007` runtime target, but lets the Rust app start the backend/frontend itself via `PRAXIS_DESKTOP_MANAGED_RUNTIME=1` instead of relying on the outer shell script.
+
 Packaging prep inside the Tauri app itself now exists too: `src-tauri/src/runtime.rs` contains a native-managed runtime scaffold behind `PRAXIS_DESKTOP_MANAGED_RUNTIME=1`, so packaged startup no longer has to begin as shell-script-only logic.
 
 ## Next step

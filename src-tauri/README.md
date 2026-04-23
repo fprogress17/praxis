@@ -40,3 +40,11 @@ Native runtime management scaffold:
 - `src-tauri/src/runtime.rs` now contains app-side process orchestration for backend/frontend startup and shutdown
 - it is gated behind `PRAXIS_DESKTOP_MANAGED_RUNTIME=1`
 - this is preparation for packaged startup, not the default dev-shell path yet
+
+Try the native-managed path directly:
+
+```bash
+npm run desktop:dev:native
+```
+
+That path builds the app first, then relies on the Rust runtime manager instead of shell-side `start-desktop-runtime.sh`.
