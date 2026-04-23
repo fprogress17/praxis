@@ -6,7 +6,7 @@
   "build": {
     "beforeDevCommand": "npm run dev:split -- 3006",
     "devUrl": "http://127.0.0.1:3006",
-    "frontendDist": "../app"
+    "frontendDist": "../desktop-launcher"
   },
   "app": {
     "windows": [
@@ -24,7 +24,9 @@
     }
   },
   "bundle": {
-    "active": false,
+    "active": true,
+    "category": "Productivity",
+    "targets": ["app"],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",

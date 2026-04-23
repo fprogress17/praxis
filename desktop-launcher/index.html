@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Praxis</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --paper: #f4efe6;
+        --ink: #171515;
+        --muted: #6d665f;
+        --accent: #ad2a1f;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+        background:
+          radial-gradient(circle at top, rgba(173, 42, 31, 0.08), transparent 42%),
+          linear-gradient(180deg, #faf6ef 0%, var(--paper) 100%);
+        color: var(--ink);
+      }
+
+      main {
+        width: min(480px, calc(100vw - 48px));
+        padding: 40px 36px;
+        border-radius: 28px;
+        background: rgba(255, 252, 248, 0.88);
+        border: 1px solid rgba(23, 21, 21, 0.08);
+        box-shadow: 0 24px 70px rgba(52, 39, 26, 0.12);
+      }
+
+      .seal {
+        width: 84px;
+        height: 84px;
+        display: grid;
+        place-items: center;
+        border-radius: 24px;
+        background: var(--accent);
+        color: #fff8ef;
+        font-size: 34px;
+        margin-bottom: 20px;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: 44px;
+        font-weight: 500;
+        letter-spacing: -0.04em;
+      }
+
+      p {
+        margin: 0;
+        line-height: 1.6;
+        font-size: 16px;
+        color: var(--muted);
+      }
+
+      .status {
+        margin-top: 28px;
+        padding-top: 22px;
+        border-top: 1px solid rgba(23, 21, 21, 0.08);
+        font-family: ui-monospace, "SF Mono", Menlo, monospace;
+        font-size: 13px;
+        letter-spacing: 0.02em;
+      }
+
+      .pulse {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        margin-right: 10px;
+        border-radius: 999px;
+        background: var(--accent);
+        box-shadow: 0 0 0 rgba(173, 42, 31, 0.3);
+        animation: pulse 1.4s infinite;
+      }
+
+      .error { color: var(--accent); }
+
+      @keyframes pulse {
+        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(173, 42, 31, 0.35); }
+        70% { transform: scale(1); box-shadow: 0 0 0 14px rgba(173, 42, 31, 0); }
+        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(173, 42, 31, 0); }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="seal">印</div>
+      <h1>Praxis</h1>
+      <p>Starting the local workspace runtime and handing off to the desktop app.</p>
+      <p class="status" id="status"><span class="pulse"></span>Waiting for local UI on 127.0.0.1:3007…</p>
+    </main>
+    <script>
+      const targetUrl = "http://127.0.0.1:3007/";
+      const status = document.getElementById("status");
+      const start = Date.now();
+
+      async function waitForFrontend() {
+        try {
+          const response = await fetch(targetUrl, { cache: "no-store", mode: "cors" });
+          if (response.ok) {
+            status.textContent = "Opening Praxis…";
+            window.location.replace(targetUrl);
+            return;
+          }
+        } catch (_error) {
+        }
+
+        if (Date.now() - start > 30000) {
+          status.classList.add("error");
+          status.textContent =
+            "Praxis could not reach the local frontend after 30 seconds. Check the desktop runtime logs.";
+          return;
+        }
+
+        setTimeout(waitForFrontend, 500);
+      }
+
+      waitForFrontend();
+    </script>
+  </body>
+</html>

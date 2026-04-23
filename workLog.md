@@ -4,6 +4,17 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 
 ---
 
+## 2026-04-23 — Build and install Praxis.app into Applications
+
+**Time:** 12:50 EDT  
+**Commit:** `PENDING`  
+**What:** Added a packaged desktop launcher page in `desktop-launcher/index.html`, switched Tauri production bundling to use that launcher in `src-tauri/tauri.conf.json`, enabled release-build native runtime startup by default in `src-tauri/src/runtime.rs`, added `npm run desktop:build` in `package.json`, updated `src-tauri/README.md`, and built a real macOS bundle at `src-tauri/target/release/bundle/macos/Praxis.app`. Then copied that bundle into `/Applications/Praxis.app` and verified the installed app binary exists at `/Applications/Praxis.app/Contents/MacOS/praxis_shell`.  
+**Cause:** The desktop shell could run in development, but there was no packaged app bundle in `/Applications` because Tauri bundling was still inactive and production packaging had no valid bundled frontend asset path.  
+**Fix / outcome:** Praxis now has a real installed macOS app bundle in `/Applications`. The packaged app still uses this repo’s local backend/frontend runtime on this machine, but it is now visible and launchable as a normal `.app`.  
+**Agent:** Codex
+
+---
+
 ## 2026-04-23 — Add desktop window-state persistence and Tauri icon set
 
 **Time:** 12:10 EDT  

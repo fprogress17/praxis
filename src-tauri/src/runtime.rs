@@ -41,7 +41,7 @@ impl ManagedRuntime {
     }
 
     pub fn maybe_start(runtime: &SharedRuntime) -> Result<(), String> {
-        if std::env::var("PRAXIS_DESKTOP_MANAGED_RUNTIME").ok().as_deref() != Some("1") {
+        if !managed_runtime_enabled() {
             return Ok(());
         }
 
@@ -95,9 +95,7 @@ impl ManagedRuntimeConfig {
     fn from_env() -> Result<Self, String> {
         let workdir = std::env::var("PRAXIS_DESKTOP_WORKDIR")
             .map(PathBuf::from)
-            .unwrap_or_else(|_| {
-                std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
-            });
+            .unwrap_or_else(|_| repo_root_dir());
         let runtime_dir = std::env::var("PRAXIS_RUNTIME_DIR")
             .map(PathBuf::from)
             .unwrap_or_else(|_| workdir.join(".runtime"));
@@ -130,6 +128,18 @@ impl ManagedRuntimeConfig {
             workdir,
         })
     }
+}
+
+fn managed_runtime_enabled() -> bool {
+    std::env::var("PRAXIS_DESKTOP_MANAGED_RUNTIME").ok().as_deref() == Some("1")
+        || !cfg!(debug_assertions)
+}
+
+fn repo_root_dir() -> PathBuf {
+    Path::new(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .map(Path::to_path_buf)
+        .unwrap_or_else(|| PathBuf::from("."))
 }
 
 fn split_args(raw: &str) -> Vec<String> {

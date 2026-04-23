@@ -16,6 +16,7 @@
     "frontend:restart": "bash scripts/stop-frontend.sh && bash scripts/start-frontend.sh",
     "dev:split": "bash scripts/dev-split-frontend.sh",
     "desktop:dev": "bash scripts/dev-tauri-native-managed.sh",
+    "desktop:build": "npm run build && npm exec -- tauri build --config src-tauri/tauri.conf.json",
     "desktop:dev:split": "bash scripts/dev-tauri.sh",
     "desktop:dev:scripted": "bash scripts/dev-tauri-runtime.sh",
     "desktop:dev:native": "bash scripts/dev-tauri-native-managed.sh",

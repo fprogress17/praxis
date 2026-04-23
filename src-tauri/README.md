@@ -7,7 +7,7 @@ Current scope:
 - development shell against the packaged-style local runtime
 - opens the production Next server at `http://127.0.0.1:3007`
 - relies on the managed backend/frontend lifecycle scripts in `scripts/`
-- does not package a standalone desktop app yet
+- can now build a real macOS `.app` bundle that launches the local runtime from this repo on this machine
 
 Run:
 
@@ -15,10 +15,16 @@ Run:
 npm run desktop:dev
 ```
 
+Build a macOS app bundle:
+
+```bash
+npm run desktop:build
+```
+
 Current limitations:
 
-- `tauri build` is not the target yet
-- startup is still partially development-oriented and not bundled as a packaged sidecar
+- the packaged `.app` still depends on this repo’s local backend/frontend files and `node_modules`
+- startup is still a local-runtime handoff, not a fully self-contained bundled sidecar
 - the split-runtime shell is still separate and available as `npm run desktop:dev:split`
 
 Packaged-runtime contract now exists separately:
@@ -40,8 +46,8 @@ Native runtime management scaffold:
 - `src-tauri/src/runtime.rs` now contains app-side process orchestration for backend/frontend startup and shutdown
 - `src-tauri/src/window_state.rs` now persists the last main-window size/position and restores it on relaunch
 - desktop icon assets now come from `src-tauri/icons/icon.svg` plus generated bundle icons
-- it is gated behind `PRAXIS_DESKTOP_MANAGED_RUNTIME=1`
-- this is preparation for packaged startup, not the default dev-shell path yet
+- it is enabled by `PRAXIS_DESKTOP_MANAGED_RUNTIME=1` in dev and by default in packaged release builds
+- the packaged app uses a tiny bundled launcher page that hands off to the local frontend on `127.0.0.1:3007`
 
 Try the native-managed path directly:
 
