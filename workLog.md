@@ -4,6 +4,17 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 
 ---
 
+## 2026-04-22 — Add explicit HTTP API slice for videos and script versions
+
+**Time:** 21:07 EDT  
+**Commit:** `8139aca`  
+**What:** Extracted video mutations and script-version persistence into shared server helpers, added `POST /api/videos`, `PATCH/DELETE /api/videos/[id]`, and `GET/POST /api/videos/[id]/script-versions`, and switched the new-video, edit-video, delete-video, and script-version UI flows from server actions to HTTP calls. Re-ran `npm run typecheck`, `npm run lint`, `npm run build`, and `npm run smoke:local`.  
+**Cause:** The channel slice established the first backend seam, but the video editor still depended on direct Next server-action calls, which would block a clean standalone backend split.  
+**Fix / outcome:** The full video workflow now speaks explicit API routes while the current local-Postgres runtime and rollback path remain intact.  
+**Agent:** Codex
+
+---
+
 ## 2026-04-22 — Add first explicit HTTP API slice for channels and homepage snapshot
 
 **Time:** 21:00 EDT  
