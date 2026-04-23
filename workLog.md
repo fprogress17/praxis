@@ -4,6 +4,17 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 
 ---
 
+## 2026-04-22 — Consolidate API logic into shared backend dispatcher
+
+**Time:** 21:57 EDT  
+**Commit:** `e3ca649`  
+**What:** Moved the actual HTTP API behavior into shared server modules by adding `lib/server/http-api.ts` plus `lib/server/next-api.ts`, shrinking the Next `app/api/*` files into thin compatibility wrappers and switching the standalone backend to use the same dispatcher. Re-ran `npm run typecheck`, `npm run lint`, `npm run build`, and `npm run smoke:local`, then live-verified the split runtime with the backend on `127.0.0.1:4001`, the frontend on `127.0.0.1:3005`, `GET /health`, and `GET /api/bootstrap`.  
+**Cause:** Next route handlers and `backend/server.ts` were still carrying duplicated backend behavior, which meant the split architecture could drift even though the frontend already had a standalone-backend path.  
+**Fix / outcome:** The standalone backend is now the single place where request behavior is defined, while Next keeps only proxy-or-dispatch compatibility shims plus revalidation. That removes the largest remaining backend duplication without breaking rollback.  
+**Agent:** Codex
+
+---
+
 ## 2026-04-22 — Proxy Next API routes to standalone backend in split mode
 
 **Time:** 21:43 EDT  
