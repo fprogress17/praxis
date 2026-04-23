@@ -7,7 +7,7 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 ## 2026-04-23 — Fix packaged app launch from Applications by using absolute Node path
 
 **Time:** 13:03 EDT  
-**Commit:** `PENDING`  
+**Commit:** `d27002b`  
 **What:** Updated the packaged-release runtime in `src-tauri/src/runtime.rs` to use a concrete Node binary path for the bundled standalone server (`/opt/homebrew/bin/node`, `/usr/local/bin/node`, `/usr/bin/node`, or `PRAXIS_DESKTOP_NODE_PATH`) instead of relying on the Finder launch environment to resolve `node` from `PATH`. Rebuilt the desktop bundle, reinstalled `/Applications/Praxis.app`, and verified a clean Applications launch by opening the app and confirming it served `HTTP 200` from `http://127.0.0.1:3007/`.  
 **Cause:** The bundled standalone server and support files were present, but opening the app like a normal macOS app failed because the packaged launch environment did not reliably include a shell `PATH` that could find `node`, so the server never started.  
 **Fix / outcome:** Praxis now starts its bundled standalone server from `/Applications` using an absolute Node binary path on this machine, so the installed app launches successfully through the normal macOS app path instead of only when run from a terminal session.  
