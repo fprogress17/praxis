@@ -7,7 +7,7 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 ## 2026-04-23 — Promote native-managed shell to default desktop path
 
 **Time:** 07:48 EDT  
-**Commit:** `(pending)`  
+**Commit:** `31860f5`  
 **What:** Switched `npm run desktop:dev` to the native-managed Tauri path, kept the old packaged-runtime shell as `desktop:dev:scripted`, and updated the root/Tauri docs plus stack notes to reflect the new default. Re-ran `npm run typecheck`, `npm run lint`, `cargo test`, and the real `npm run desktop:dev` launch/shutdown path, then confirmed backend `4001` and frontend `3007` came up and were gone again after exit.  
 **Cause:** The native-managed shell path was already verified end to end, so keeping it as a sidecar command no longer matched the packaging direction of the repo.  
 **Fix / outcome:** The default desktop dev command now exercises the Rust-managed runtime path, while the script-managed packaged-runtime shell remains available as an explicit rollback path.  
