@@ -4,6 +4,17 @@ Format: **newest at top**. Per `instruction.md`: date, time, commit (if any), br
 
 ---
 
+## 2026-04-23 — Add documented roadmap for next product and reliability work
+
+**Time:** 20:05 EDT  
+**Commit:** `PENDING`  
+**What:** Added `NEXT_STEPS.md` documenting the current app state plus the recommended next priorities: automated tests, LAN protection, better desktop settings UX, backup/export, file integrity checks, browser companion polish, and further architecture cleanup.  
+**Cause:** The app now has a working local-first desktop and LAN-capable runtime, so the next highest-value work should be written down clearly in the repo instead of living only in chat.  
+**Fix / outcome:** The repo now contains a concrete next-steps document that can be used as the working roadmap for future features and reliability improvements.  
+**Agent:** Codex
+
+---
+
 ## 2026-04-23 — Add desktop LAN settings page and optional local-network sharing
 
 **Time:** 14:24 EDT  
